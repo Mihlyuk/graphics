@@ -1,0 +1,77 @@
+<div class="drawing" style="height: 505px;">
+  <canvas style="float:left; margin-right: 20px;" class="query" width="500px" height="500px"></canvas>
+  <br>
+  <div class="sections" style="float:left">
+    <button id="perspective" type="button" class="add-image btn navbar-btn">
+      <span class="glyphicon glyphicon-camera" aria-hidden="true"></span>
+    </button>
+    <button id="scalePlus" type="button" class="add-image btn navbar-btn">
+      <span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span>
+    </button>
+    <button id="scaleMinus" type="button" class="add-image btn navbar-btn">
+      <span class="glyphicon glyphicon-zoom-out" aria-hidden="true"></span>
+    </button>
+    <button id="clearCanvas" type="button" class="add-image btn btn-danger navbar-btn">clear</button>
+    <label for="throttling">Throttle</label>
+    <input id="throttling" type="number" style="width:40px" value=0 min=0 max=50 pattern="\d+">
+    <button id="meshOn" type="button" class="add-image btn btn-success navbar-btn">Вкл. сетку</button>
+    <button id="meshOff" type="button" class="add-image btn btn-danger navbar-btn">Выкл. сетку</button>
+
+    <hr style="margin-top: 0; margin-bottom: 0; border: 0; border-top: 1px solid #515050;">
+
+    <div class="section" data-section="1">
+      <button id="cda" type="button" class="add-image btn btn-primary navbar-btn">ЦДА</button>
+      <button id="brez" type="button" class="add-image btn btn-primary navbar-btn">Брезенхем</button>
+      <button id="woo" type="button" class="add-image btn btn-primary navbar-btn">Ву</button>
+      <hr style="margin-top: 0; margin-bottom: 0; border: 0; border-top: 1px solid #515050;">
+      <button id="circle" type="button" class="add-image btn btn-primary navbar-btn">Circle</button>
+      <label for="circleRadius">Radius</label>
+      <input id="circleRadius" type="number" style="width:40px" value=1 min=0 max=50 pattern="\d+">
+      <br>
+      <button id="ellipse" type="button" class="add-image btn btn-primary navbar-btn">Ellipse</button>
+      <label for="ellipseRadiusX">Radius</label>
+      <input id="ellipseRadiusX" type="number" style="width:40px" value=1 min=0 max=50 pattern="\d+">
+      <label for="ellipseRadiusY">Radius</label>
+      <input id="ellipseRadiusY" type="number" style="width:40px" value=1 min=0 max=50 pattern="\d+">
+      <br>
+      <button id="hyperbola" type="button" class="add-image btn btn-primary navbar-btn">Hyperbola</button>
+      <label for="hyperbolaRadiusX">Radius</label>
+      <input id="hyperbolaRadiusX" type="number" style="width:40px" value=1 min=0 max=50 pattern="\d+">
+      <label for="hyperbolaRadiusY">Radius</label>
+      <input id="hyperbolaRadiusY" type="number" style="width:40px" value=1 min=0 max=50 pattern="\d+">
+      <br>
+      <button id="parabola" type="button" class="add-image btn btn-primary navbar-btn">Parabola</button>
+      <label for="parabolaRadius">Radius</label>
+      <input id="parabolaRadius" type="number" style="width:40px" value=1 min=0 max=50 pattern="\d+">
+      <hr style="margin-top: 0; margin-bottom: 0; border: 0; border-top: 1px solid #515050;">
+      <button id="hermit" type="button" class="add-image btn btn-primary navbar-btn">Хермит</button>
+      <button id="bezier" type="button" class="add-image btn btn-primary navbar-btn">Безьер</button>
+      <button id="b_spline" type="button" class="add-image btn btn-primary navbar-btn">B-сплайн</button>
+    </div>
+
+    <div class="section" data-section="2" style="display:none;">
+      <label for="axisX1">X1</label>
+      <input id="axisX1" type="number" style="width:40px" value=1 min=0 max=50 pattern="\d+">
+      <label for="axisY1">Y1</label>
+      <input id="axisY1" type="number" style="width:40px" value=1 min=0 max=50 pattern="\d+">
+      <label for="axisZ1">Z1</label>
+      <input id="axisZ1" type="number" style="width:40px" value=1 min=0 max=50 pattern="\d+">
+      <label for="axisX2">X2</label>
+      <input id="axisX2" type="number" style="width:40px" value=1 min=0 max=50 pattern="\d+">
+      <label for="axisY2">Y2</label>
+      <input id="axisY2" type="number" style="width:40px" value=1 min=0 max=50 pattern="\d+">
+      <label for="axisZ2">Z2</label>
+      <input id="axisZ2" type="number" style="width:40px" value=1 min=0 max=50 pattern="\d+">
+      <button id="axisOn" type="button" class="add-image btn btn-success navbar-btn">Вкл. ось</button>
+      <button id="axisOff" type="button" class="add-image btn btn-danger navbar-btn">Выкл. ось</button>
+      <hr style="margin-top: 0; margin-bottom: 0; border: 0; border-top: 1px solid #515050;">
+      <button id="cube" type="button" class="add-image btn btn-success navbar-btn">
+        Вставить куб
+      </button>
+      <hr style="margin-top: 0; margin-bottom: 0; border: 0; border-top: 1px solid #515050;">
+
+    </div>
+
+  </div>
+</div>
+</div>
