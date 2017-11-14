@@ -78,32 +78,32 @@
     dom.document.on('keydown', function (event) {
         switch (event.keyCode) {
             case 65:
-                editor.coordinates().each(function (coordinate) {
+                editor.coordinates().forEach(function (coordinate) {
                     coordinate.moveX(-1);
                 });
                 break;
             case 68:
-                editor.coordinates().each(function (coordinate) {
+                editor.coordinates().forEach(function (coordinate) {
                     coordinate.moveX(+1);
                 });
                 break;
             case 87:
-                editor.coordinates().each(function (coordinate) {
+                editor.coordinates().forEach(function (coordinate) {
                     coordinate.moveY(-1);
                 });
                 break;
             case 88:
-                editor.coordinates().each(function (coordinate) {
+                editor.coordinates().forEach(function (coordinate) {
                     coordinate.moveY(+1);
                 });
                 break;
             case 69:
-                editor.coordinates().each(function (coordinate) {
+                editor.coordinates().forEach(function (coordinate) {
                     coordinate.moveZ(-1);
                 });
                 break;
             case 90:
-                editor.coordinates().each(function (coordinate) {
+                editor.coordinates().forEach(function (coordinate) {
                     coordinate.moveZ(+1);
                 });
                 break;
@@ -136,26 +136,27 @@
         });
     });
 
-
-    $('#cda').on('click', function () {
-        if (getCoordinates().length !== 2) {
+    dom.cdaButton.on('click', function () {
+        debugger;
+        if (editor.coordinates().length !== 2) {
             alert("Нужно ввести 2 координаты !!!");
             return;
         }
 
-        updateCanvas();
-
         $.ajax({
             type: "POST",
             url: "/cda",
-            data: {coordinates: getCoordinates()},
+            data: {coordinates: editor.coordinatesArray()},
             success: function (responce) {
-                drawArrayRects(JSON.parse(responce).result);
+                debugger;
+                editor.clearCoordinates();
+                editor.addCoordinates(JSON.parse(responce).result);
+                editor.update();
             }
         });
     });
 
-    $('#brez').on('click', function () {
+    dom.brezButton.on('click', function () {
         if (getCoordinates().length !== 2) {
             alert("Нужно ввести 2 координаты !!!");
             return;

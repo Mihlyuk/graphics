@@ -30,6 +30,8 @@ function Dom() {
     this.clearCanvas = $('#clearCanvas');
     this.cube = $('#cube');
     this.document = $(document);
+    this.cdaButton = $('#cda');
+    this.brezButton = $('#brez');
 
     this.allNavSections = $('.nav .section');
     this.defSection = function (section) {

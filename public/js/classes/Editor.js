@@ -37,9 +37,9 @@ function Editor(canvas_init) {
         });
     };
 
-    this.coordinatesArray = function() {
-        return this.coordinates().map(function(coordinate) {
-             coordinate.toArray();
+    this.coordinatesArray = function () {
+        return this.coordinates().map(function (coordinate) {
+            coordinate.toArray();
         });
     };
 
@@ -53,6 +53,7 @@ function Editor(canvas_init) {
 
     this.clear = function () {
         context.clearRect(0, 0, canvasHeight, canvasWidth);
+
         this.removeTimer();
     };
 
@@ -162,10 +163,21 @@ function Editor(canvas_init) {
             this.draw(axisLine);
         }
 
-        this.coordinates.forEach(function (coordinate) {
-            self.draw(coordinate);
-        });
+        if (this.timer() > 0) {
+            var temp_coordinates = this.coordinates();
 
+            this.timer(setInterval(function () {
+                self.draw(temp_coordinates.shift());
+
+                if (temp_coordinates.length === 0) {
+                    self.removeTimer();
+                }
+            }), this.timer() * 100);
+        } else {
+            this.coordinates.forEach(function (coordinate) {
+                self.draw(coordinate);
+            });
+        }
     };
 
 }
