@@ -24,10 +24,10 @@ function Line(parameters) {
         if (parameters['x2'] !== undefined) {
             x2 = parseFloat(parameters['x2']);
         }
-        if (parameters['x2'] !== undefined) {
-            y2 = parseFloat(parameters['y']);
+        if (parameters['y2'] !== undefined) {
+            y2 = parseFloat(parameters['y2']);
         }
-        if (parameters['x2'] !== undefined) {
+        if (parameters['z2'] !== undefined) {
             z2 = parseFloat(parameters['z2']);
         }
         if (parameters['perspective1'] !== undefined) {
@@ -43,7 +43,7 @@ function Line(parameters) {
             color = parameters['color'];
         }
         if (parameters['lineWidth'] !== undefined) {
-            color = parseFloat(parameters['lineWidth']);
+            lineWidth = parseFloat(parameters['lineWidth']);
         }
     };
 
@@ -110,4 +110,5 @@ function Line(parameters) {
         return [[x1, y1, z1, perspective1], [y2, y2, z2, perspective2]];
     };
 
+    this.set(parameters);
 }

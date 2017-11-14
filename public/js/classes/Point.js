@@ -7,27 +7,27 @@ function Point(parameters) {
         color = 'black';
 
     this.set = function (parameters) {
-        if (parseFloat(parameters['x'])) {
+        if (parameters['x']) {
             x = parseFloat(parameters['x']);
         }
 
-        if (parseFloat(parameters['y'])) {
+        if (parameters['y']) {
             y = parseFloat(parameters['y']);
         }
 
-        if (parseFloat(parameters['z'])) {
+        if (parameters['z']) {
             z = parseFloat(parameters['z']);
         }
 
-        if (parseFloat(parameters['perspective'])) {
+        if (parameters['perspective']) {
             perspective = parseFloat(parameters['perspective']);
         }
 
-        if (parseFloat(parameters['alpha'])) {
+        if (parameters['alpha']) {
             alpha = parseFloat(parameters['alpha']);
         }
 
-        if (typeof parameters['color'] === 'string') {
+        if (parameters['color']) {
             color = parameters['color'];
         }
     };

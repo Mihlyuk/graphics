@@ -21,14 +21,26 @@ function Editor(canvas_init) {
         coordinates = [];
     };
 
-    this.addCoordinate = function (point) {
-        if (typeof point !== 'Point') {
-            throw new TypeError("Class is of type Point.");
+    /**
+     * Добавить координату в общий пулл.
+     *
+     * @param { Point|Line|number[] } coordinate
+     */
+    this.addCoordinate = function (coordinate) {
+        if (coordinate instanceof Point || coordinate instanceof Line) {
+            coordinates.push(coordinate);
+        } else if (Array.isArray(coordinate)) {
+            coordinates.push(this.toPoint(coordinate));
+        } else {
+            throw new TypeError("Incorrect type.");
         }
-
-        coordinates.push(point);
     };
 
+    /**
+     * Добавить массив координат в общий пулл.
+     *
+     * @param { [Point|Line|number[]] } pointsArray
+     */
     this.addCoordinates = function (pointsArray) {
         var self = this;
 
@@ -37,18 +49,15 @@ function Editor(canvas_init) {
         });
     };
 
+    /**
+     * Возвращает координаты в виде массива координат.
+     *
+     * @return { [<[number[]] | [number[],number[]]>] }
+     */
     this.coordinatesArray = function () {
         return this.coordinates().map(function (coordinate) {
-            coordinate.toArray();
+            return coordinate.toArray();
         });
-    };
-
-    this.addLine = function (line) {
-        if (typeof line !== 'Line') {
-            throw new TypeError("Class is of type Line.");
-        }
-
-        coordinates.push(line);
     };
 
     this.clear = function () {
@@ -58,7 +67,7 @@ function Editor(canvas_init) {
     };
 
     this.scale = function (scale_new) {
-        if (scale !== undefined) {
+        if (scale_new !== undefined) {
             scale = scale_new;
         } else {
             return scale;
@@ -66,7 +75,7 @@ function Editor(canvas_init) {
     };
 
     this.mesh = function (mesh_new) {
-        if (mesh !== undefined) {
+        if (mesh_new !== undefined) {
             mesh = mesh_new;
         } else {
             return mesh;
@@ -101,56 +110,141 @@ function Editor(canvas_init) {
         clearInterval(timerId);
     };
 
+    /**
+     * Рисует объует типа Point или Line
+     *
+     * @param { Point|Line|number[] } coordinate
+     */
     this.draw = function (coordinate) {
         context.globalAlpha = coordinate.alpha();
         context.fillStyle = coordinate.color();
-        context.lineWidth = coordinate.lineWidth();
 
-        if (typeof coordinate === 'Point') {
+        if (Array.isArray(coordinate)) {
+            coordinate = this.toPoint(coordinate);
+        }
+
+        if (coordinate instanceof Point) {
             var x = (coordinate.x() / coordinate.perspective()) * this.scale();
             var y = (coordinate.y() / coordinate.perspective()) * this.scale();
 
             context.fillRect(x, y, this.scale(), this.scale());
-        } else if (typeof coordinate === 'Line') {
+        } else if (coordinate instanceof Line) {
+            context.lineWidth = coordinate.lineWidth();
+
             context.beginPath();
-            var x1 = (coordinate.x1() / coordinate.perspective()) * this.scale();
-            var y1 = (coordinate.y1() / coordinate.perspective()) * this.scale();
-            var x2 = (coordinate.x2() / coordinate.perspective()) * this.scale();
-            var y2 = (coordinate.y2() / coordinate.perspective()) * this.scale();
+
+            var x1 = (coordinate.x1() / coordinate.perspective1());
+            var y1 = (coordinate.y1() / coordinate.perspective1());
+            var x2 = (coordinate.x2() / coordinate.perspective2());
+            var y2 = (coordinate.y2() / coordinate.perspective2());
 
             context.moveTo(x1, y1);
             context.lineTo(x2, y2);
             context.stroke();
+
+            context.lineWidth = 1.0;
         } else {
             throw new TypeError("Unsupported coordinate class");
         }
 
         context.globalAlpha = 1.0;
         context.fillStyle = 'black';
-        context.lineWidth = 1.0;
     };
 
-    this.update = function () {
+    /**
+     * Переводит координату в объект Point или Line.
+     *
+     * @param { number[] | [number[],number[]] } coordinate
+     *
+     * @return {Point|Line}
+     */
+    this.toPoint = function (coordinate) {
+        var result = null;
+
+        if (Array.isArray(coordinate[0]) && Array.isArray(coordinate[1])) {
+            result = new Line({
+                x1: coordinate[0][0], y1: coordinate[0][1], z1: coordinate[0][2], perspective1: coordinate[0][3],
+                x2: coordinate[1][0], y2: coordinate[1][1], z2: coordinate[1][2], perspective2: coordinate[1][3]
+            })
+        } else {
+            result = new Point({
+                x: coordinate[0], y: coordinate[1], z: coordinate[2], perspective: coordinate[3]
+            });
+        }
+
+        return result;
+    };
+
+    /**
+     * Переводит массив координат в массив объектов Point или Line.
+     *
+     * @param { [number[]] | [[number[],number[]]] } coordinates
+     *
+     * @return { [Point|Line] }
+     */
+    this.toPoints = function (coordinates) {
         var self = this;
+
+        return coordinates.map(function (coordinate) {
+            return self.toPoint(coordinate);
+        });
+    };
+
+    /**
+     * Рисует массив точек или линий
+     *
+     * Массив координат, которые необходимо нарисовать.
+     * @param { [Point|Line] } coordinates - Массив объектов Point или Line.
+     * @param { [number[]] } coordinates - Массив координат точек.
+     * @param { [[number[],number[]]] } coordinates - Массив координат линий.
+     */
+    this.drawArray = function (coordinates) {
+        var self = this;
+
+        if (Array.isArray(coordinates[0])) {
+            coordinates = this.toPoints(coordinates);
+        }
+
+        if (dom.timeoutValue() > 0) {
+            var temp_coordinates = jQuery.extend([], coordinates);
+
+            this.timer(setInterval(function () {
+                if (temp_coordinates.length === 0) {
+                    self.removeTimer();
+                } else {
+                    self.draw(temp_coordinates.shift());
+                }
+            }), dom.timeoutValue() * 1000);
+        } else {
+            coordinates.forEach(function (coordinate) {
+                self.draw(coordinate);
+            });
+        }
+    };
+
+    /**
+     * Перерисовывает холст.
+     */
+    this.update = function () {
         this.clear();
 
         // Drawing mesh
         if (this.mesh()) {
-            for (var x = 1; x < this.canvasWidth; x++) {
+            for (var x = 1; x < this.canvasWidth(); x++) {
                 if (x % this.scale() === 0) {
-                    this.draw(new Line({x1: x, y1: 0, x2: x, y2: this.canvasHeight, lineWidth: 0.1}));
+                    this.draw(new Line({x1: x, y1: 0, x2: x, y2: this.canvasHeight(), lineWidth: 0.2}));
                 }
             }
 
-            for (var y = 1; y < this.canvasHeight; y++) {
-                if (y % this.scale === 0) {
-                    this.draw(new Line({x1: 0, y1: y, x2: this.canvasWidth, y2: y, lineWidth: 0.1}));
+            for (var y = 1; y < this.canvasHeight(); y++) {
+                if (y % this.scale() === 0) {
+                    this.draw(new Line({x1: 0, y1: y, x2: this.canvasWidth(), y2: y, lineWidth: 0.2}));
                 }
             }
         }
 
         // Drawing axis
-        if (this.axis) {
+        if (this.axis()) {
             var axisLine = new Line({
                 x1: dom.axisX1Value,
                 y1: dom.axisY1Value,
@@ -163,21 +257,7 @@ function Editor(canvas_init) {
             this.draw(axisLine);
         }
 
-        if (this.timer() > 0) {
-            var temp_coordinates = this.coordinates();
-
-            this.timer(setInterval(function () {
-                self.draw(temp_coordinates.shift());
-
-                if (temp_coordinates.length === 0) {
-                    self.removeTimer();
-                }
-            }), this.timer() * 100);
-        } else {
-            this.coordinates.forEach(function (coordinate) {
-                self.draw(coordinate);
-            });
-        }
+        this.drawArray(this.coordinates());
     };
 
 }

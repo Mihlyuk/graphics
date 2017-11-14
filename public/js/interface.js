@@ -1,6 +1,6 @@
 (function () {
     var dom = new Dom();
-    var editor = new Editor(dom.canvas());
+    var editor = new Editor(dom.canvas[0]);
 
     // Переключение секций
     dom.allNavSections.on('click', function () {
@@ -13,7 +13,7 @@
     });
 
     //Добавление координаты при нажатии мыши
-    dom.canvas().on('mousedown', function (event) {
+    dom.canvas.on('mousedown', function (event) {
         event.preventDefault();
         var scale = editor.scale();
 
@@ -23,7 +23,7 @@
         });
 
         editor.addCoordinate(point);
-        editor.update();
+        editor.draw(point);
     });
 
     dom.meshOn.on('click', function () {
@@ -81,34 +81,39 @@
                 editor.coordinates().forEach(function (coordinate) {
                     coordinate.moveX(-1);
                 });
+                editor.update();
                 break;
             case 68:
                 editor.coordinates().forEach(function (coordinate) {
                     coordinate.moveX(+1);
                 });
+                editor.update();
                 break;
             case 87:
                 editor.coordinates().forEach(function (coordinate) {
                     coordinate.moveY(-1);
                 });
+                editor.update();
                 break;
             case 88:
                 editor.coordinates().forEach(function (coordinate) {
                     coordinate.moveY(+1);
                 });
+                editor.update();
                 break;
             case 69:
                 editor.coordinates().forEach(function (coordinate) {
                     coordinate.moveZ(-1);
                 });
+                editor.update();
                 break;
             case 90:
                 editor.coordinates().forEach(function (coordinate) {
                     coordinate.moveZ(+1);
                 });
+                editor.update();
                 break;
         }
-        editor.update();
     });
 
     dom.canvas.on('wheel', function (event) {
@@ -137,7 +142,6 @@
     });
 
     dom.cdaButton.on('click', function () {
-        debugger;
         if (editor.coordinates().length !== 2) {
             alert("Нужно ввести 2 координаты !!!");
             return;
@@ -148,15 +152,36 @@
             url: "/cda",
             data: {coordinates: editor.coordinatesArray()},
             success: function (responce) {
-                debugger;
+                var coordinates = JSON.parse(responce).result;
+
                 editor.clearCoordinates();
-                editor.addCoordinates(JSON.parse(responce).result);
-                editor.update();
+                editor.drawArray(coordinates);
             }
         });
     });
 
     dom.brezButton.on('click', function () {
+        if (editor.coordinates().length !== 2) {
+            alert("Нужно ввести 2 координаты !!!");
+            return;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/brez",
+            data: {coordinates: editor.coordinatesArray()},
+            success: function (responce) {
+                var coordinates = JSON.parse(responce).result.forEach(function(coordinate) {
+
+                });
+                editor.clearCoordinates();
+                editor.addCoordinates();
+                editor.update();
+            }
+        });
+    });
+
+    $('#woo').on('click', function () {
         if (getCoordinates().length !== 2) {
             alert("Нужно ввести 2 координаты !!!");
             return;
@@ -166,7 +191,7 @@
 
         $.ajax({
             type: "POST",
-            url: "/brez",
+            url: "/woo",
             data: {coordinates: getCoordinates()},
             success: function (responce) {
                 drawArrayRects(JSON.parse(responce).result);
@@ -246,23 +271,7 @@
         });
     });
 
-    $('#woo').on('click', function () {
-        if (getCoordinates().length !== 2) {
-            alert("Нужно ввести 2 координаты !!!");
-            return;
-        }
 
-        updateCanvas();
-
-        $.ajax({
-            type: "POST",
-            url: "/woo",
-            data: {coordinates: getCoordinates()},
-            success: function (responce) {
-                drawArrayRects(JSON.parse(responce).result);
-            }
-        });
-    });
 
     $('#hermit').on('click', function () {
         if (getCoordinates().length !== 4) {
