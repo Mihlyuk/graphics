@@ -1,6 +1,6 @@
 require_relative 'Constants.rb'
 
-module Algorithms2d
+class Algorithms2d
 
   def self.brezenhem(x1, y1, x2, y2)
     result = []
@@ -330,7 +330,7 @@ module Algorithms2d
   def self.draw_hermite(x1, y1, x1_vec, y1_vec, x2, y2, x2_vec, y2_vec, step=0.01)
     result = []
 
-    coef = ERMIT_MATRIX * Matrix[[x1, y1], [x2, y2], [x1_vec, y1_vec], [x2_vec, y2_vec]]
+    coef = Constants::ERMIT_MATRIX  * Matrix[[x1, y1], [x2, y2], [x1_vec, y1_vec], [x2_vec, y2_vec]]
 
     (0..1).step(step).each do |n|
       result << (Matrix[[n ** 3, n ** 2, n, 1]] * coef).to_a.flatten
@@ -342,7 +342,7 @@ module Algorithms2d
   def self.draw_bezier(x1, y1, x2, y2, x3, y3, x4, y4, step=0.01)
     result = []
 
-    coef = BEZIER_MATRIX * Matrix[[x1, y1], [x2, y2], [x3, y3], [x4, y4]]
+    coef = Constants::BEZIER_MATRIX * Matrix[[x1, y1], [x2, y2], [x3, y3], [x4, y4]]
 
     (0..1).step(step).each do |n|
       result << (Matrix[[n ** 3, n ** 2, n, 1]] * coef).to_a.flatten
@@ -355,7 +355,7 @@ module Algorithms2d
     result = []
 
     (1..points.size - 3).each do |i|
-      coef = B_SPLINE_MATRIX * Matrix[
+      coef = Constants::B_SPLINE_MATRIX * Matrix[
           [points[i-1][0], points[i-1][1]],
           [points[i][0]  , points[i][1]],
           [points[i+1][0], points[i+1][1]],

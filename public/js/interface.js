@@ -1,6 +1,7 @@
 (function () {
     var dom = new Dom();
     var editor = new Editor(dom.canvas[0]);
+    var algorithms = new Algorithms();
 
     // Переключение секций
     dom.allNavSections.on('click', function () {
@@ -8,7 +9,7 @@
         $(this).addClass('active');
 
         var section = $(this).data()['section'];
-        dom.allNavSections.css('display', 'none');
+        dom.allSections.css('display', 'none');
         dom.defSection(section).css('display', '')
     });
 
@@ -47,12 +48,12 @@
     });
 
     dom.scalePlus.on('click', function () {
-        editor.scale(editor.scale * 2);
+        editor.scale(editor.scale() * 2);
         editor.update();
     });
 
     dom.scaleMinus.on('click', function () {
-        editor.scale(editor.scale / 2);
+        editor.scale(editor.scale() / 2);
         editor.update();
     });
 
@@ -61,16 +62,16 @@
         editor.update();
     });
 
-    dom.axisX1.on('change', editor.update);
-    dom.axisY1.on('change', editor.update);
-    dom.axisZ1.on('change', editor.update);
-    dom.axisX2.on('change', editor.update);
-    dom.axisY2.on('change', editor.update);
-    dom.axisZ2.on('change', editor.update);
+    dom.axisX1.on('change', editor.update.bind(editor));
+    dom.axisY1.on('change', editor.update.bind(editor));
+    dom.axisZ1.on('change', editor.update.bind(editor));
+    dom.axisX2.on('change', editor.update.bind(editor));
+    dom.axisY2.on('change', editor.update.bind(editor));
+    dom.axisZ2.on('change', editor.update.bind(editor));
 
     dom.cube.on('click', function () {
         cube.forEach(function (coordinate) {
-            editor.addCoordinate({x: coordinate[0], y: coordinate[1], z: coordinate[2]});
+            editor.addCoordinate(new Point({x: coordinate[0], y: coordinate[1], z: coordinate[2]}));
             editor.update();
         })
     });
@@ -113,6 +114,10 @@
                 });
                 editor.update();
                 break;
+            case 67:
+                editor.clearCoordinates();
+                editor.update();
+                break;
         }
     });
 
@@ -124,21 +129,15 @@
             return;
         }
 
+        var coordinates = editor.coordinatesArray();
         var axis = [
-            [dom.axisX1Value, dom.axisY1Value, dom.axisZ1Value],
-            [dom.axisX2Value, dom.axisY2Value, dom.axisZ2Value]
+            [dom.axisX1Value(), dom.axisY1Value(), dom.axisZ1Value()],
+            [dom.axisX2Value(), dom.axisY2Value(), dom.axisZ2Value()]
         ];
 
-        $.ajax({
-            type: "POST",
-            url: "/rotate",
-            data: {coordinates: editor.coordinatesArray(), angle: 30, axis: axis},
-            success: function (responce) {
-                editor.clearCoordinates();
-                editor.addCoordinates(JSON.parse(responce).result);
-                editor.update();
-            }
-        });
+        editor.clearCoordinates();
+        editor.addCoordinates(algorithms.rotate(coordinates, axis, 30));
+        editor.update();
     });
 
     dom.cdaButton.on('click', function () {
@@ -171,180 +170,211 @@
             url: "/brez",
             data: {coordinates: editor.coordinatesArray()},
             success: function (responce) {
-                var coordinates = JSON.parse(responce).result.forEach(function(coordinate) {
+                var coordinates = JSON.parse(responce).result;
 
-                });
                 editor.clearCoordinates();
-                editor.addCoordinates();
-                editor.update();
+                editor.drawArray(coordinates);
             }
         });
     });
 
-    $('#woo').on('click', function () {
-        if (getCoordinates().length !== 2) {
+    dom.wooButton.on('click', function () {
+        if (editor.coordinates().length !== 2) {
             alert("Нужно ввести 2 координаты !!!");
             return;
         }
 
-        updateCanvas();
-
         $.ajax({
             type: "POST",
             url: "/woo",
-            data: {coordinates: getCoordinates()},
+            data: {coordinates: editor.coordinatesArray()},
             success: function (responce) {
-                drawArrayRects(JSON.parse(responce).result);
+                var coordinates = JSON.parse(responce).result.map(function (coordinate) {
+                    return new Point({x: coordinate[0], y: coordinate[1], alpha: coordinate[2]});
+                });
+
+                editor.clearCoordinates();
+                editor.drawArray(coordinates);
             }
         });
     });
 
-    $('#circle').on('click', function () {
-        if (getCoordinates().length !== 1) {
+    dom.circleButton.on('click', function () {
+        if (editor.coordinates().length !== 1) {
             alert("Нужно ввести 1 координату !!!");
             return;
         }
-
-        updateCanvas();
 
         $.ajax({
             type: "POST",
             url: "/circle",
-            data: {coordinates: getCoordinates(), radius: getCircleRadius()},
+            data: {coordinates: editor.coordinatesArray(), radius: dom.circleRadius()},
             success: function (responce) {
-                drawArrayRects(JSON.parse(responce).result);
+                var coordinates = JSON.parse(responce).result;
+
+                editor.clearCoordinates();
+                editor.drawArray(coordinates);
             }
         });
     });
 
-    $('#ellipse').on('click', function () {
-        if (getCoordinates().length !== 1) {
+    dom.ellipseButton.on('click', function () {
+        if (editor.coordinates().length !== 1) {
             alert("Нужно ввести 1 координату !!!");
             return;
         }
-
-        updateCanvas();
 
         $.ajax({
             type: "POST",
             url: "/ellipse",
-            data: {coordinates: getCoordinates(), radiusX: getEllipseRadiusX(), radiusY: getEllipseRadiusY()},
+            data: {
+                coordinates: editor.coordinatesArray(),
+                radiusX: dom.ellipseRadiusX(),
+                radiusY: dom.ellipseRadiusY()
+            },
             success: function (responce) {
-                drawArrayRects(JSON.parse(responce).result);
+                var coordinates = JSON.parse(responce).result;
+
+                editor.clearCoordinates();
+                editor.drawArray(coordinates);
             }
         });
     });
 
-    $('#hyperbola').on('click', function () {
-        if (getCoordinates().length !== 1) {
+    dom.hyperbolaButton.on('click', function () {
+        if (editor.coordinates().length !== 1) {
             alert("Нужно ввести 1 координату !!!");
             return;
         }
-
-        updateCanvas();
 
         $.ajax({
             type: "POST",
             url: "/hyperbola",
-            data: {coordinates: getCoordinates(), radiusX: getHyperbolaRadiusX(), radiusY: getHyperbolaRadiusY()},
+            data: {
+                coordinates: editor.coordinatesArray(),
+                radiusX: dom.hyperbolaRadiusX(),
+                radiusY: dom.hyperbolaRadiusY()
+            },
             success: function (responce) {
-                drawArrayRects(JSON.parse(responce).result);
+                var coordinates = JSON.parse(responce).result;
+
+                editor.clearCoordinates();
+                editor.drawArray(coordinates);
             }
         });
     });
 
-    $('#parabola').on('click', function () {
-        if (getCoordinates().length !== 1) {
+    dom.parabolaButton.on('click', function () {
+        if (editor.coordinates().length !== 1) {
             alert("Нужно ввести 1 координату !!!");
             return;
         }
 
-        updateCanvas();
-
         $.ajax({
             type: "POST",
             url: "/parabola",
-            data: {coordinates: getCoordinates(), radius: getParabolaRadius()},
+            data: {coordinates: editor.coordinatesArray(), radius: dom.parabolaRadius()},
             success: function (responce) {
-                drawArrayRects(JSON.parse(responce).result);
+                var coordinates = JSON.parse(responce).result;
+
+                editor.clearCoordinates();
+                editor.drawArray(coordinates);
             }
         });
     });
 
 
-
-    $('#hermit').on('click', function () {
-        if (getCoordinates().length !== 4) {
+    dom.hermitButton.on('click', function () {
+        if (editor.coordinates().length !== 4) {
             alert("Нужно ввести 4 координаты !!!");
             return;
         }
-
-        updateCanvas();
 
         $.ajax({
             type: "POST",
             url: "/hermit",
-            data: {coordinates: getCoordinates()},
+            data: {coordinates: editor.coordinatesArray()},
             success: function (responce) {
-                drawArrayRects(JSON.parse(responce).result);
+                var coordinates = JSON.parse(responce).result;
+
+                editor.clearCoordinates();
+                editor.drawArray(coordinates);
             }
         });
     });
 
-    $('#bezier').on('click', function () {
-        if (getCoordinates().length !== 4) {
+    dom.bezierButton.on('click', function () {
+        if (editor.coordinates().length !== 4) {
             alert("Нужно ввести 4 координаты !!!");
             return;
         }
 
-        updateCanvas();
-
         $.ajax({
             type: "POST",
             url: "/bezier",
-            data: {coordinates: getCoordinates()},
+            data: {coordinates: editor.coordinatesArray()},
             success: function (responce) {
-                drawArrayRects(JSON.parse(responce).result);
+                var coordinates = JSON.parse(responce).result;
+
+                editor.clearCoordinates();
+                editor.drawArray(coordinates);
             }
         });
     });
 
-    $('#b_spline').on('click', function () {
-        updateCanvas();
-
+    dom.BSplineButton.on('click', function () {
         $.ajax({
             type: "POST",
             url: "/b_spline",
-            data: {coordinates: getCoordinates()},
+            data: {coordinates: editor.coordinatesArray()},
             success: function (responce) {
-                drawArrayRects(JSON.parse(responce).result);
+                var coordinates = JSON.parse(responce).result;
+
+                editor.clearCoordinates();
+                editor.drawArray(coordinates);
             }
         });
     });
 
-    $('#b_spline').on('click', function () {
-        updateCanvas();
-
-        $.ajax({
-            type: "POST",
-            url: "/b_spline",
-            data: {coordinates: getCoordinates()},
-            success: function (responce) {
-                drawArrayRects(JSON.parse(responce).result);
-            }
-        });
-    });
-
-    $('#perspective').on('click', function () {
+    dom.perspectiveButton.on('click', function () {
         $.ajax({
             type: "POST",
             url: "/perspective",
-            data: {coordinates: getCoordinates(), perspective: 10},
+            data: {coordinates: editor.coordinatesArray(), perspective: 10},
             success: function (responce) {
-                clearCoordinates();
-                addCoordinates(JSON.parse(responce).result);
-                updateCanvas();
+                var coordinates = JSON.parse(responce).result;
+
+                editor.clearCoordinates();
+                editor.drawArray(coordinates);
             }
         });
+    });
+
+    dom.createPoligonButton.on('click', function () {
+        var points_count = dom.poligonPoints();
+        var editorHeight = editor.height() / editor.scale();
+        var editorWidth = editor.width() / editor.scale();
+        var editorDepth = editor.height() / editor.scale();
+        var coordinates = [];
+
+        for (var i = 0; i < points_count; i++) {
+            coordinates.push([
+                Math.random() * editorWidth, Math.random() * editorHeight, Math.random() * editorDepth
+            ])
+        }
+
+        coordinates.push(coordinates[0]);
+
+        for (var i = 1; i < coordinates.length; i++) {
+            editor.addCoordinate(new Line({
+                x1: coordinates[i - 1][0],
+                y1: coordinates[i - 1][1],
+                z1: coordinates[i - 1][2],
+                x2: coordinates[i][0],
+                y2: coordinates[i][1],
+                z2: coordinates[i][2]
+            }))
+        }
+        editor.update();
     });
 })();

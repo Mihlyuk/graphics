@@ -66,6 +66,14 @@ function Editor(canvas_init) {
         this.removeTimer();
     };
 
+    this.height = function () {
+        return height;
+    };
+
+    this.width = function () {
+
+    };
+
     this.scale = function (scale_new) {
         if (scale_new !== undefined) {
             scale = scale_new;
@@ -82,16 +90,16 @@ function Editor(canvas_init) {
         }
     };
 
-    this.canvasHeight = function () {
+    this.height = function () {
         return canvasHeight;
     };
 
-    this.canvasWidth = function () {
+    this.width = function () {
         return canvasWidth;
     };
 
     this.axis = function (axis_new) {
-        if (axis !== undefined) {
+        if (axis_new !== undefined) {
             axis = axis_new;
         } else {
             return axis;
@@ -118,6 +126,7 @@ function Editor(canvas_init) {
     this.draw = function (coordinate) {
         context.globalAlpha = coordinate.alpha();
         context.fillStyle = coordinate.color();
+        context.strokeStyle = coordinate.color();
 
         if (Array.isArray(coordinate)) {
             coordinate = this.toPoint(coordinate);
@@ -129,14 +138,14 @@ function Editor(canvas_init) {
 
             context.fillRect(x, y, this.scale(), this.scale());
         } else if (coordinate instanceof Line) {
-            context.lineWidth = coordinate.lineWidth();
+            context.lineWidth = coordinate.lineWidth() ? coordinate.lineWidth() : this.scale();
 
             context.beginPath();
 
-            var x1 = (coordinate.x1() / coordinate.perspective1());
-            var y1 = (coordinate.y1() / coordinate.perspective1());
-            var x2 = (coordinate.x2() / coordinate.perspective2());
-            var y2 = (coordinate.y2() / coordinate.perspective2());
+            var x1 = (coordinate.x1() / coordinate.perspective1()) * this.scale();
+            var y1 = (coordinate.y1() / coordinate.perspective1()) * this.scale();
+            var x2 = (coordinate.x2() / coordinate.perspective2()) * this.scale();
+            var y2 = (coordinate.y2() / coordinate.perspective2()) * this.scale();
 
             context.moveTo(x1, y1);
             context.lineTo(x2, y2);
@@ -149,6 +158,7 @@ function Editor(canvas_init) {
 
         context.globalAlpha = 1.0;
         context.fillStyle = 'black';
+        context.strokeStyle = 'black';
     };
 
     /**
@@ -214,7 +224,7 @@ function Editor(canvas_init) {
                 } else {
                     self.draw(temp_coordinates.shift());
                 }
-            }), dom.timeoutValue() * 1000);
+            }, dom.timeoutValue() * 1000));
         } else {
             coordinates.forEach(function (coordinate) {
                 self.draw(coordinate);
@@ -230,28 +240,23 @@ function Editor(canvas_init) {
 
         // Drawing mesh
         if (this.mesh()) {
-            for (var x = 1; x < this.canvasWidth(); x++) {
-                if (x % this.scale() === 0) {
-                    this.draw(new Line({x1: x, y1: 0, x2: x, y2: this.canvasHeight(), lineWidth: 0.2}));
-                }
+            for (var x = 1; x < this.width() / this.scale(); x++) {
+                this.draw(new Line({x1: x, y1: 0, x2: x, y2: this.height() / this.scale(), lineWidth: 0.2}));
             }
 
-            for (var y = 1; y < this.canvasHeight(); y++) {
-                if (y % this.scale() === 0) {
-                    this.draw(new Line({x1: 0, y1: y, x2: this.canvasWidth(), y2: y, lineWidth: 0.2}));
-                }
+            for (var y = 1; y < this.height() / this.scale(); y++) {
+                this.draw(new Line({x1: 0, y1: y, x2: this.width() / this.scale(), y2: y, lineWidth: 0.2}));
             }
         }
 
         // Drawing axis
         if (this.axis()) {
             var axisLine = new Line({
-                x1: dom.axisX1Value,
-                y1: dom.axisY1Value,
-                x2: dom.axisX2Value,
-                y2: dom.axisY2Value,
-                color: 'red',
-                lineWidth: 0.5
+                x1: dom.axisX1Value(),
+                y1: dom.axisY1Value(),
+                x2: dom.axisX2Value(),
+                y2: dom.axisY2Value(),
+                color: '#FBBC05'
             });
 
             this.draw(axisLine);

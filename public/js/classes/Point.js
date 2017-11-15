@@ -7,6 +7,9 @@ function Point(parameters) {
         color = 'black';
 
     this.set = function (parameters) {
+        if (!parameters) {
+            return;
+        }
         if (parameters['x']) {
             x = parseFloat(parameters['x']);
         }
