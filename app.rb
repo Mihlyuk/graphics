@@ -5,6 +5,7 @@ require 'json'
 require 'pry'
 require_relative 'algorithms/algorithms2d'
 require_relative 'algorithms/algorithms3d'
+require_relative 'algorithms/poligonsAlgorithms.rb'
 
 class Array
   def x
@@ -160,14 +161,34 @@ post '/perspective' do
   {result: Algorithms3d.perspective(coordinates, perspective)}.to_json
 end
 
+post '/bulgeChecking' do
+  coordinates = get_coordinates(:coordinates)
+
+  {result: PoligonsAlgorithms.bulge_checking(coordinates)}.to_json
+end
+
+post '/grekhemShell' do
+  coordinates = get_coordinates(:coordinates)
+
+  result = []
+  PoligonsAlgorithms.grekhem_shell(coordinates).each_cons(2) { |a,b| result << [a,b] }
+
+  {result: result}.to_json
+end
+
+post '/jarvisShell' do
+  coordinates = get_coordinates(:coordinates)
+
+  {result: PoligonsAlgorithms.jarvis_shell(coordinates)}.to_json
+end
+
 def get_coordinates(field)
-  @params[field].map do |k, v|
-    [
-        (v[0] ? v[0] : 1).to_f,
-        (v[1] ? v[1] : 1).to_f,
-        (v[2] ? v[2] : 1).to_f,
-        (v[3] ? v[3] : 1).to_f
-    ]
+  @params[field].values.map do |a|
+    if a.is_a?(Hash)
+      a.values.map { |b| b.map { |d| d.to_f } }
+    else
+      a.map { |c| c.to_f }
+    end
   end
 end
 

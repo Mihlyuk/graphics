@@ -124,13 +124,13 @@ function Editor(canvas_init) {
      * @param { Point|Line|number[] } coordinate
      */
     this.draw = function (coordinate) {
-        context.globalAlpha = coordinate.alpha();
-        context.fillStyle = coordinate.color();
-        context.strokeStyle = coordinate.color();
-
         if (Array.isArray(coordinate)) {
             coordinate = this.toPoint(coordinate);
         }
+
+        context.globalAlpha = coordinate.alpha();
+        context.fillStyle = coordinate.color();
+        context.strokeStyle = coordinate.color();
 
         if (coordinate instanceof Point) {
             var x = (coordinate.x() / coordinate.perspective()) * this.scale();

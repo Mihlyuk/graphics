@@ -350,6 +350,18 @@
         });
     });
 
+    dom.createPoligonButtonExample1.on('click', function () {
+        editor.addCoordinate(new Point({x: 24, y: 23}));
+        editor.addCoordinate(new Point({x: 21, y: 18}));
+        editor.addCoordinate(new Point({x: 11, y: 14}));
+        editor.addCoordinate(new Point({x: 11, y: 8}));
+        editor.addCoordinate(new Point({x: 15, y: 20}));
+        editor.addCoordinate(new Point({x: 21, y: 14}));
+        editor.addCoordinate(new Point({x: 8, y: 23}));
+
+        editor.update();
+    });
+
     dom.createPoligonButton.on('click', function () {
         var points_count = dom.poligonPoints();
         var editorHeight = editor.height() / editor.scale();
@@ -377,4 +389,55 @@
         }
         editor.update();
     });
+
+    dom.bulgeCheckingButton.on('click', function () {
+        $.ajax({
+            type: "POST",
+            url: "/bulgeChecking",
+            data: {coordinates: editor.coordinatesArray()},
+            success: function (responce) {
+                var normals = JSON.parse(responce).result.normals;
+                var bulge = JSON.parse(responce).result.bulge;
+
+                alert("Нормали: " + normals.toString());
+                switch (bulge) {
+                    case 'cut':
+                        alert("Полигон вырождается в отрезок.");
+                        break;
+                    case 'convex_left':
+                        alert("Полигон выпуклый, нормали ориентированы влево от контура.");
+                        break;
+                    case 'convex_right':
+                        alert("Полигон выпуклый, нормали ориентированы вправо от контура.");
+                        break;
+                    case 'concave':
+                        alert("Вогнутый полигон.");
+                        break;
+                }
+            }
+        });
+    });
+
+    dom.GreckemShellButton.on('click', function () {
+        $.ajax({
+            type: "POST",
+            url: "/grekhemShell",
+            data: {coordinates: editor.coordinatesArray()},
+            success: function (responce) {
+                editor.drawArray(JSON.parse(responce).result);
+            }
+        });
+    });
+
+    dom.JarvisShellButton.on('click', function () {
+        $.ajax({
+            type: "POST",
+            url: "/jarvisShell",
+            data: {coordinates: editor.coordinatesArray()},
+            success: function (responce) {
+                debugger;
+            }
+        });
+    });
+
 })();

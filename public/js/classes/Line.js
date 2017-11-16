@@ -107,7 +107,7 @@ function Line(parameters) {
     };
 
     this.toArray = function () {
-        return [[x1, y1, z1, perspective1], [y2, y2, z2, perspective2]];
+        return [[x1, y1, z1, perspective1], [x2, y2, z2, perspective2]];
     };
 
     this.set(parameters);
