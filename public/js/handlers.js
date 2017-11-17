@@ -20,7 +20,8 @@
 
         var point = new Point({
             x: Math.floor(event.offsetX / scale),
-            y: Math.floor(event.offsetY / scale)
+            y: Math.floor(event.offsetY / scale),
+            color: '#0006DF'
         });
 
         editor.addCoordinate(point);
@@ -59,6 +60,7 @@
 
     dom.clearCanvas.on('click', function () {
         editor.clearCoordinates();
+        editor.clearFigures();
         editor.update();
     });
 
@@ -75,6 +77,7 @@
             editor.update();
         })
     });
+
 
     dom.document.on('keydown', function (event) {
         switch (event.keyCode) {
@@ -350,51 +353,54 @@
         });
     });
 
-    dom.createPoligonButtonExample1.on('click', function () {
-        editor.addCoordinate(new Point({x: 24, y: 23}));
-        editor.addCoordinate(new Point({x: 21, y: 18}));
-        editor.addCoordinate(new Point({x: 11, y: 14}));
-        editor.addCoordinate(new Point({x: 11, y: 8}));
-        editor.addCoordinate(new Point({x: 15, y: 20}));
-        editor.addCoordinate(new Point({x: 21, y: 14}));
-        editor.addCoordinate(new Point({x: 8, y: 23}));
+    dom.createPoligonButton.on('click', function () {
+        if (editor.coordinates().length === 0) {
+            alert("Нужно ввести хотя бы одн укоординату !!!");
+            return;
+        }
 
+        var figure = [];
+        var coordinates = editor.coordinates();
+        coordinates.push(editor.coordinates()[0]);
+
+        for (var i = 1; i < coordinates.length; i++) {
+            figure.push(new Line({
+                x1: coordinates[i - 1].x(),
+                y1: coordinates[i - 1].y(),
+                x2: coordinates[i].x(),
+                y2: coordinates[i].y()
+            }));
+        }
+        editor.clearCoordinates();
+        editor.addFigure(figure);
         editor.update();
     });
 
-    dom.createPoligonButton.on('click', function () {
-        var points_count = dom.poligonPoints();
-        var editorHeight = editor.height() / editor.scale();
-        var editorWidth = editor.width() / editor.scale();
-        var editorDepth = editor.height() / editor.scale();
-        var coordinates = [];
-
-        for (var i = 0; i < points_count; i++) {
-            coordinates.push([
-                Math.random() * editorWidth, Math.random() * editorHeight, Math.random() * editorDepth
-            ])
+    dom.createLineButton.on('click', function () {
+        if (editor.coordinates().length !== 2) {
+            alert("Нужно ввести две координаты !!!");
+            return;
         }
+        var coordinates = editor.coordinates();
 
-        coordinates.push(coordinates[0]);
+        editor.addFigure([new Line({
+            x1: coordinates[0].x(),
+            y1: coordinates[0].y(),
+            x2: coordinates[1].x(),
+            y2: coordinates[1].y()
+        })]);
 
-        for (var i = 1; i < coordinates.length; i++) {
-            editor.addCoordinate(new Line({
-                x1: coordinates[i - 1][0],
-                y1: coordinates[i - 1][1],
-                z1: coordinates[i - 1][2],
-                x2: coordinates[i][0],
-                y2: coordinates[i][1],
-                z2: coordinates[i][2]
-            }))
-        }
+        editor.clearCoordinates();
         editor.update();
     });
 
     dom.bulgeCheckingButton.on('click', function () {
+        var figures = editor.figuresArray();
+
         $.ajax({
             type: "POST",
             url: "/bulgeChecking",
-            data: {coordinates: editor.coordinatesArray()},
+            data: {coordinates: figures[figures.length - 1]},
             success: function (responce) {
                 var normals = JSON.parse(responce).result.normals;
                 var bulge = JSON.parse(responce).result.bulge;
@@ -424,7 +430,17 @@
             url: "/grekhemShell",
             data: {coordinates: editor.coordinatesArray()},
             success: function (responce) {
-                editor.drawArray(JSON.parse(responce).result);
+                var figure = JSON.parse(responce).result.map(function (line) {
+                    return new Line({
+                        x1: line[0][0],
+                        y1: line[0][1],
+                        x2: line[1][0],
+                        y2: line[1][1]
+                    });
+                });
+                editor.addFigure(figure);
+                editor.clearCoordinates();
+                editor.update();
             }
         });
     });
@@ -435,7 +451,52 @@
             url: "/jarvisShell",
             data: {coordinates: editor.coordinatesArray()},
             success: function (responce) {
-                debugger;
+                var figure = JSON.parse(responce).result.map(function (line) {
+                    return new Line({
+                        x1: line[0][0],
+                        y1: line[0][1],
+                        x2: line[1][0],
+                        y2: line[1][1]
+                    });
+                });
+                editor.addFigure(figure);
+                editor.clearCoordinates();
+                editor.update();
+            }
+        });
+    });
+
+    dom.pointOfIntersectionButton.on('click', function () {
+        $.ajax({
+            type: "POST",
+            url: "/point_of_intersection",
+            data: {poligon: editor.figuresArray()[0], line: editor.figuresArray()[1]},
+            success: function (responce) {
+                var coordinates = JSON.parse(responce).result;
+                coordinates = coordinates.map(function (coordinate) {
+                    return new Point({
+                        x: coordinate[0],
+                        y: coordinate[1],
+                        color: '#FB0003'
+                    });
+                });
+
+                editor.drawArray(coordinates);
+            }
+        });
+    });
+
+    dom.membershipPointButton.on('click', function() {
+        $.ajax({
+            type: "POST",
+            url: "/membership_point",
+            data: {poligon: editor.figuresArray()[0], point: editor.coordinatesArray()[0] },
+            success: function (responce) {
+                if (JSON.parse(responce).result) {
+                    alert('Точка принадлежит плоскости');
+                } else {
+                    alert('Точка не принадлежит плоскости');
+                }
             }
         });
     });

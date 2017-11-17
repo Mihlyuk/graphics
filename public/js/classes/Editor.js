@@ -13,12 +13,52 @@ function Editor(canvas_init) {
     // the array of points
     var coordinates = [];
 
+    //the array of figures
+    var figures = [];
+
+
     this.coordinates = function () {
         return coordinates;
     };
 
     this.clearCoordinates = function () {
         coordinates = [];
+    };
+
+    this.clearFigures = function() {
+        figures = [];
+    };
+
+    /**
+     * Добавить фигуру в общий пулл.
+     *
+     * @param { Point[]|Line[]|number[] } figure
+     */
+    this.addFigure = function (figure) {
+        var self = this;
+
+        figure = figure.map(function (primitive) {
+            if (Array.isArray(primitive)) {
+                return coordinates.push(self.toPoint(primitive));
+            } else {
+                return primitive;
+            }
+        });
+
+        figures.push(figure);
+    };
+
+    /**
+     * Возвращает координаты фигур в виде массива координат.
+     *
+     * @return { [<[number[]] | [number[],number[]]>] }
+     */
+    this.figuresArray = function() {
+        return figures.map(function(figure) {
+            return figure.map(function(point) {
+                return point.toArray();
+            });
+        });
     };
 
     /**
@@ -236,6 +276,7 @@ function Editor(canvas_init) {
      * Перерисовывает холст.
      */
     this.update = function () {
+        var self = this;
         this.clear();
 
         // Drawing mesh
@@ -263,6 +304,9 @@ function Editor(canvas_init) {
         }
 
         this.drawArray(this.coordinates());
+        figures.forEach(function(figure) {
+            self.drawArray(figure);
+        });
     };
 
 }

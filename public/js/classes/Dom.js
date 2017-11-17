@@ -85,11 +85,12 @@ function Dom() {
     this.BSplineButton = $('#b_spline');
     this.perspectiveButton = $('#perspective');
     this.createPoligonButton = $('#createPoligon');
-    this.createPoligonButtonExample1 = $('#createPoligonExample1');
-    this.createPoligonButtonExample2 = $('#createPoligonExample2');
+    this.createLineButton = $('#createLine');
     this.bulgeCheckingButton = $('#bulgeChecking');
     this.GreckemShellButton = $('#GrekhemShell');
     this.JarvisShellButton = $('#JarvisShell');
+    this.pointOfIntersectionButton = $('#point_of_intersection');
+    this.membershipPointButton = $('#membership_points');
 
     this.poligonPoints = function () {
         return parseInt($('input#poligonPoints')[0].value);

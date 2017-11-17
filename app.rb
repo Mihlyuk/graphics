@@ -139,7 +139,7 @@ post '/bezier' do
 end
 
 post '/b_spline' do
-  points = @params[:coordinates].map { |k, v| v.map { |l| l.to_i } }
+  points = @params[:coordinates].map {|k, v| v.map {|l| l.to_i}}
 
   result = Algorithms2d.draw_b_spline(points)
 
@@ -164,14 +164,14 @@ end
 post '/bulgeChecking' do
   coordinates = get_coordinates(:coordinates)
 
-  {result: PoligonsAlgorithms.bulge_checking(coordinates)}.to_json
+  {result: PoligonsAlgorithms.normals(coordinates)}.to_json
 end
 
 post '/grekhemShell' do
   coordinates = get_coordinates(:coordinates)
 
   result = []
-  PoligonsAlgorithms.grekhem_shell(coordinates).each_cons(2) { |a,b| result << [a,b] }
+  PoligonsAlgorithms.grekhem_shell(coordinates).each_cons(2) {|a, b| result << [a, b]}
 
   {result: result}.to_json
 end
@@ -179,15 +179,36 @@ end
 post '/jarvisShell' do
   coordinates = get_coordinates(:coordinates)
 
-  {result: PoligonsAlgorithms.jarvis_shell(coordinates)}.to_json
+  result = []
+  PoligonsAlgorithms.jarvis_shell(coordinates).each_cons(2) {|a, b| result << [a, b]}
+
+  {result: result}.to_json
 end
+
+post '/point_of_intersection' do
+  poligon = get_coordinates(:poligon)
+  line = get_coordinates(:line)
+
+  {result: PoligonsAlgorithms.point_of_intersection(poligon, line)}.to_json
+end
+
+post '/membership_point' do
+  poligon = get_coordinates(:poligon)
+  point = @params[:point].map { |a| a.to_f }
+
+  {result: PoligonsAlgorithms.membership_point(poligon, point)}.to_json
+end
+
+
 
 def get_coordinates(field)
   @params[field].values.map do |a|
     if a.is_a?(Hash)
-      a.values.map { |b| b.map { |d| d.to_f } }
+      a.values.map {|b| b.map {|d| d.to_f}}
+    elsif a.is_a?(Array)
+      a.map {|c| c.to_f}
     else
-      a.map { |c| c.to_f }
+      a.to_f
     end
   end
 end
