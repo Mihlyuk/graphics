@@ -199,6 +199,11 @@ post '/membership_point' do
   {result: PoligonsAlgorithms.membership_point(poligon, point)}.to_json
 end
 
+post '/raster_scan_1' do
+  poligon = get_coordinates(:poligon)
+
+  {result: PoligonsAlgorithms.raster_scan_1(poligon)}.to_json
+end
 
 
 def get_coordinates(field)

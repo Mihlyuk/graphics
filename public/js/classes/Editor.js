@@ -25,7 +25,7 @@ function Editor(canvas_init) {
         coordinates = [];
     };
 
-    this.clearFigures = function() {
+    this.clearFigures = function () {
         figures = [];
     };
 
@@ -53,9 +53,9 @@ function Editor(canvas_init) {
      *
      * @return { [<[number[]] | [number[],number[]]>] }
      */
-    this.figuresArray = function() {
-        return figures.map(function(figure) {
-            return figure.map(function(point) {
+    this.figuresArray = function () {
+        return figures.map(function (figure) {
+            return figure.map(function (point) {
                 return point.toArray();
             });
         });
@@ -178,14 +178,14 @@ function Editor(canvas_init) {
 
             context.fillRect(x, y, this.scale(), this.scale());
         } else if (coordinate instanceof Line) {
-            context.lineWidth = coordinate.lineWidth() ? coordinate.lineWidth() : this.scale();
+            context.lineWidth = coordinate.lineWidth() * this.scale();
 
             context.beginPath();
 
-            var x1 = (coordinate.x1() / coordinate.perspective1()) * this.scale();
-            var y1 = (coordinate.y1() / coordinate.perspective1()) * this.scale();
-            var x2 = (coordinate.x2() / coordinate.perspective2()) * this.scale();
-            var y2 = (coordinate.y2() / coordinate.perspective2()) * this.scale();
+            var x1 = (coordinate.x1() / coordinate.perspective1()) * this.scale() + this.scale() / 2;
+            var y1 = (coordinate.y1() / coordinate.perspective1()) * this.scale() + this.scale() / 2;
+            var x2 = (coordinate.x2() / coordinate.perspective2()) * this.scale() + this.scale() / 2;
+            var y2 = (coordinate.y2() / coordinate.perspective2()) * this.scale() + this.scale() / 2;
 
             context.moveTo(x1, y1);
             context.lineTo(x2, y2);
@@ -196,9 +196,23 @@ function Editor(canvas_init) {
             throw new TypeError("Unsupported coordinate class");
         }
 
-        context.globalAlpha = 1.0;
-        context.fillStyle = 'black';
-        context.strokeStyle = 'black';
+        this.contextReset();
+    };
+
+    /**
+     * Рисует текст
+     *
+     * @param {TextObject} textObject
+     */
+    this.drawText = function (textObject) {
+        context.font = textObject.font();
+        context.fillStyle = textObject.color();
+        context.textAlign = textObject.textAlign();
+        context.globalAlpha = textObject.alpha();
+
+        context.fillText(textObject.text(), textObject.x() * this.scale(), textObject.y() * this.scale());
+
+        this.contextReset();
     };
 
     /**
@@ -282,11 +296,35 @@ function Editor(canvas_init) {
         // Drawing mesh
         if (this.mesh()) {
             for (var x = 1; x < this.width() / this.scale(); x++) {
-                this.draw(new Line({x1: x, y1: 0, x2: x, y2: this.height() / this.scale(), lineWidth: 0.2}));
+                this.draw(new Line({
+                    x1: x - 0.5, y1: 0 - 0.5, x2: x - 0.5, y2: this.height() / this.scale() - 0.5,
+                    lineWidth: 0.03,
+                    alpha: 0.4
+                }));
+
+                    this.drawText(new TextObject({
+                        x: x - 0.5, y: 0.5,
+                        text: (x - 1).toString(),
+                        font: (this.scale() / 2).toString() + 'px Arial',
+                        alpha: 0.4
+                    }));
             }
 
             for (var y = 1; y < this.height() / this.scale(); y++) {
-                this.draw(new Line({x1: 0, y1: y, x2: this.width() / this.scale(), y2: y, lineWidth: 0.2}));
+                this.draw(new Line({
+                    x1: 0 - 0.5, y1: y - 0.5, x2: this.width() / this.scale() - 0.5, y2: y - 0.5,
+                    lineWidth: 0.03,
+                    alpha: 0.3
+                }));
+                if (y !== 1) {
+                    this.drawText(new TextObject({
+                        x: 0.1, y: y - 0.5 + 0.2,
+                        text: (y - 1).toString(),
+                        font: (this.scale() / 2).toString() + 'px Arial',
+                        textAlign: 'left',
+                        alpha: 0.3
+                    }));
+                }
             }
         }
 
@@ -304,10 +342,17 @@ function Editor(canvas_init) {
         }
 
         this.drawArray(this.coordinates());
-        figures.forEach(function(figure) {
+        figures.forEach(function (figure) {
             self.drawArray(figure);
         });
     };
 
+    this.contextReset = function () {
+        context.globalAlpha = 1.0;
+        context.fillStyle = 'black';
+        context.strokeStyle = 'black';
+        context.font = '10px Arial';
+        context.textAlign = 'center';
+    }
 }
 

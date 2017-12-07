@@ -21,7 +21,6 @@ class Algorithms2d
     if dx >= dy
       e = 2 * dy - dx
       while i <= dx do
-        e_old = e
         if e >= 0
           y += change_y
           e -= 2 * dx
@@ -34,7 +33,6 @@ class Algorithms2d
     else
       e = 2 * dx - dy
       while i <= dy do
-        e_old = e
         if e >= 0
           x += change_x
           e -= 2 * dy
@@ -330,7 +328,7 @@ class Algorithms2d
   def self.draw_hermite(x1, y1, x1_vec, y1_vec, x2, y2, x2_vec, y2_vec, step=0.01)
     result = []
 
-    coef = Constants::ERMIT_MATRIX  * Matrix[[x1, y1], [x2, y2], [x1_vec, y1_vec], [x2_vec, y2_vec]]
+    coef = Constants::ERMIT_MATRIX * Matrix[[x1, y1], [x2, y2], [x1_vec, y1_vec], [x2_vec, y2_vec]]
 
     (0..1).step(step).each do |n|
       result << (Matrix[[n ** 3, n ** 2, n, 1]] * coef).to_a.flatten
@@ -357,7 +355,7 @@ class Algorithms2d
     (1..points.size - 3).each do |i|
       coef = Constants::B_SPLINE_MATRIX * Matrix[
           [points[i-1][0], points[i-1][1]],
-          [points[i][0]  , points[i][1]],
+          [points[i][0], points[i][1]],
           [points[i+1][0], points[i+1][1]],
           [points[i+2][0], points[i+2][1]]
       ]

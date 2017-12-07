@@ -368,7 +368,8 @@
                 x1: coordinates[i - 1].x(),
                 y1: coordinates[i - 1].y(),
                 x2: coordinates[i].x(),
-                y2: coordinates[i].y()
+                y2: coordinates[i].y(),
+                lineWidth: 0.3
             }));
         }
         editor.clearCoordinates();
@@ -387,7 +388,8 @@
             x1: coordinates[0].x(),
             y1: coordinates[0].y(),
             x2: coordinates[1].x(),
-            y2: coordinates[1].y()
+            y2: coordinates[1].y(),
+            lineWidth: 0.3
         })]);
 
         editor.clearCoordinates();
@@ -499,6 +501,36 @@
                 }
             }
         });
+    });
+
+    dom.sketch1Button.on('click', function() {
+        if (editor.figuresArray().length < 1) {
+            alert("Для начала нарисуйте полигон =)");
+            return;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/raster_scan_1",
+            data: {poligon: editor.figuresArray()[0] },
+            success: function (responce) {
+                JSON.parse(responce).result.forEach(function(point) {
+                    editor.draw(point);
+                });
+            }
+        });
+    });
+
+    dom.sketch2Button.on('click', function() {
+
+    });
+
+    dom.sketch3Button.on('click', function() {
+
+    });
+
+    dom.sketch4Button.on('click', function() {
+
     });
 
 })();

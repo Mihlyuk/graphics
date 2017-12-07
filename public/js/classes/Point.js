@@ -1,4 +1,14 @@
 function Point(parameters) {
+    /**
+     * Create a Point object.
+     * @param {number} x - The x coordinate.
+     * @param {number} y - The y coordinate.
+     * @param {number} z - The z coordinate.
+     * @param {number} perspective - Perspective for point object.
+     * @param {number} alpha - The transparency of the point.
+     * @param {number} color - The color of the point.
+     */
+
     var x = 0,
         y = 0,
         z = 0,
@@ -6,7 +16,7 @@ function Point(parameters) {
         alpha = 1,
         color = 'black';
 
-    this.set = function (parameters) {
+    this.init = function (parameters) {
         if (!parameters) {
             return;
         }
@@ -75,5 +85,5 @@ function Point(parameters) {
         return [x, y, z, perspective];
     };
 
-    this.set(parameters);
+    this.init(parameters);
 }

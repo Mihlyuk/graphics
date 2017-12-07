@@ -1,4 +1,18 @@
 function Line(parameters) {
+    /**
+     * Create a Line object.
+     * @param {number} x1 - The x1 coordinate.
+     * @param {number} y1 - The y1 coordinate.
+     * @param {number} z1 - The z1 coordinate.
+     * @param {number} x2 - The x2 coordinate.
+     * @param {number} y2 - The y2 coordinate.
+     * @param {number} z2 - The z2 coordinate.
+     * @param {number} perspective1 - Perspective for first coordinate.
+     * @param {number} perspective2 - Perspective for second coordinate.
+     * @param {number} alpha - The transparency of the line.
+     * @param {number} color - The color of the line.
+     * @param {number} lineWidth - The line width of the line.
+     */
     var x1 = 0,
         y1 = 0,
         z1 = 0,
@@ -9,9 +23,9 @@ function Line(parameters) {
         perspective2 = 1,
         alpha = 1,
         color = 'black',
-        lineWidth;
+        lineWidth = 1;
 
-    this.set = function (parameters) {
+    this.init = function (parameters) {
         if (parameters['x1'] !== undefined) {
             x1 = parseFloat(parameters['x1']);
         }
@@ -93,11 +107,11 @@ function Line(parameters) {
 
     this.moveX = function (x_diff) {
         x1 = x1 + x_diff;
-        x1 = x1 + x_diff;
+        x2 = x2 + x_diff;
     };
 
     this.moveY = function (y_diff) {
-        y2 = y2 + y_diff;
+        y1 = y1 + y_diff;
         y2 = y2 + y_diff;
     };
 
@@ -110,5 +124,5 @@ function Line(parameters) {
         return [[x1, y1, z1, perspective1], [x2, y2, z2, perspective2]];
     };
 
-    this.set(parameters);
+    this.init(parameters);
 }

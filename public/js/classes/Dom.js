@@ -91,6 +91,10 @@ function Dom() {
     this.JarvisShellButton = $('#JarvisShell');
     this.pointOfIntersectionButton = $('#point_of_intersection');
     this.membershipPointButton = $('#membership_points');
+    this.sketch1Button = $('#sketch1');
+    this.sketch2Button = $('#sketch2');
+    this.sketch3Button = $('#sketch3');
+    this.sketch4Button = $('#sketch4');
 
     this.poligonPoints = function () {
         return parseInt($('input#poligonPoints')[0].value);
