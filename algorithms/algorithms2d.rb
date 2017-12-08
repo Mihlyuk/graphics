@@ -2,19 +2,18 @@ require_relative 'Constants.rb'
 
 class Algorithms2d
 
-  def self.brezenhem(x1, y1, x2, y2)
+  def self.brezenhem(point_1, point_2)
     result = []
 
-    x = x1
-    y = y1
-    dx = (x2 - x1).abs
-    dy = (y2 - y1).abs
-    e = 0.0
+    x = point_1.x
+    y = point_1.y
+    dx = (point_2.x - point_1.x).abs
+    dy = (point_2.y - point_1.y).abs
 
-    change_x = x1 < x2 ? 1 : -1
-    change_y = y1 < y2 ? 1 : -1
+    change_x = point_1.x < point_2.x ? 1 : -1
+    change_y = point_1.y < point_2.y ? 1 : -1
 
-    result << [x, y]
+    result << [x, y, point_1.z, point_1.p]
 
     i = 1
 
@@ -27,7 +26,7 @@ class Algorithms2d
         end
         x += change_x
         e += 2 * dy
-        result << [x, y]
+        result << [x, y, point_1.z, point_1.p]
         i+=1
       end
     else
@@ -39,7 +38,7 @@ class Algorithms2d
         end
         y += change_y
         e += 2 * dx
-        result << [x, y]
+        result << [x, y, point_1.z, point_1.p]
         i+=1
       end
     end
@@ -380,6 +379,10 @@ class Algorithms2d
     c = -x1 * (y2 - y1) + y1 * (x2 - x1)
 
     (a * x + b * y + c).abs / Math.sqrt(a**2 + b**2)
+  end
+
+  def self.line_distance2(x, y, x1, y1, x2, y2)
+    ((y1-y2)*x + (x2-x1)*y + (x1*y2-x2*y1)).abs / Math.sqrt((x2-x1)**2 + (y2-y1)**2)
   end
 
   def self.sign(number)

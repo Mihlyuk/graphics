@@ -522,15 +522,94 @@
     });
 
     dom.sketch2Button.on('click', function() {
+        if (editor.figuresArray().length < 1) {
+            alert("Для начала нарисуйте полигон =)");
+            return;
+        }
 
+        $.ajax({
+            type: "POST",
+            url: "/raster_scan_1",
+            data: {poligon: editor.figuresArray()[0] },
+            success: function (responce) {
+                JSON.parse(responce).result.forEach(function(point) {
+                    editor.draw(point);
+                });
+            }
+        });
     });
 
     dom.sketch3Button.on('click', function() {
+        if (editor.figuresArray().length < 1) {
+            alert("Для начала нарисуйте полигон =)");
+            return;
+        }
 
+        $.ajax({
+            type: "POST",
+            url: "/raster_scan_3",
+            data: {poligon: editor.figuresArray()[0], coordinate: editor.coordinatesArray()[0] },
+            success: function (responce) {
+                JSON.parse(responce).result.forEach(function(point) {
+                    editor.draw(point);
+                });
+            }
+        });
     });
 
     dom.sketch4Button.on('click', function() {
+        if (editor.figuresArray().length < 1) {
+            alert("Для начала нарисуйте полигон =)");
+            return;
+        }
 
+        $.ajax({
+            type: "POST",
+            url: "/raster_scan_4",
+            data: {poligon: editor.figuresArray()[0], coordinate: editor.coordinatesArray()[0] },
+            success: function (responce) {
+                JSON.parse(responce).result.forEach(function(point) {
+                    editor.draw(point);
+                });
+            }
+        });
     });
+
+    dom.sketch4Button.on('click', function() {
+        if (editor.figuresArray().length < 1) {
+            alert("Нарисуйте полигон =)");
+            return;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/raster_scan_4",
+            data: {poligon: editor.figuresArray()[0], coordinate: editor.coordinatesArray()[0] },
+            success: function (responce) {
+                JSON.parse(responce).result.forEach(function(point) {
+                    editor.draw(point);
+                });
+            }
+        });
+    });
+
+    dom.hideLines1.on('click', function() {
+        if (editor.figuresArray().length < 1) {
+            alert("Нарисуйте полигон =)");
+            return;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/hide_lines_1",
+            data: {poligon: editor.figuresArray()[0], lines: editor.figuresArray().slice(1) },
+            success: function (responce) {
+                JSON.parse(responce).result.forEach(function(point) {
+                    editor.draw(point);
+                });
+            }
+        });
+    });
+
 
 })();

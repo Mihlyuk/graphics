@@ -95,6 +95,7 @@ function Dom() {
     this.sketch2Button = $('#sketch2');
     this.sketch3Button = $('#sketch3');
     this.sketch4Button = $('#sketch4');
+    this.hideLines1 = $('#hideLines1');
 
     this.poligonPoints = function () {
         return parseInt($('input#poligonPoints')[0].value);
