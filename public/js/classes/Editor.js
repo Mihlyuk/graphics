@@ -21,6 +21,10 @@ function Editor(canvas_init) {
         return coordinates;
     };
 
+    this.figures = function () {
+        return figures;
+    };
+
     this.clearCoordinates = function () {
         coordinates = [];
     };
@@ -61,6 +65,33 @@ function Editor(canvas_init) {
         });
     };
 
+    this.figuresToCoordinates = function (figures) {
+        var resultCoordinates = [];
+
+        figures.forEach(function (figure) {
+            figure.forEach(function (lines) {
+                resultCoordinates.push(lines[0]);
+                resultCoordinates.push(lines[1]);
+            });
+        });
+
+        return resultCoordinates;
+    };
+
+    this.coordinatesToFigures = function (coordinates) {
+        var resultFigures = [];
+
+        for (var i = 0; i < coordinates.length; i += 8) {
+            resultFigures.push([
+                [coordinates[i], coordinates[i + 1]],
+                [coordinates[i + 2], coordinates[i + 3]],
+                [coordinates[i + 4], coordinates[i + 5]],
+                [coordinates[i + 6], coordinates[i + 7]]
+            ]);
+        }
+
+        return resultFigures;
+    };
     /**
      * Добавить координату в общий пулл.
      *
@@ -286,6 +317,23 @@ function Editor(canvas_init) {
         }
     };
 
+    this.drawFigure = function (figure) {
+        var self = this;
+        if (figure[0].color()) {
+            context.fillStyle = figure[0].color();
+        }
+
+        context.beginPath();
+        context.moveTo(figure[0].x1() * this.scale(), figure[0].y1() * this.scale());
+
+        figure.forEach(function (line) {
+            context.lineTo(line.x2() * self.scale(), line.y2() * self.scale());
+        });
+        context.fill();
+
+        this.contextReset();
+    };
+
     /**
      * Перерисовывает холст.
      */
@@ -302,12 +350,12 @@ function Editor(canvas_init) {
                     alpha: 0.4
                 }));
 
-                    this.drawText(new TextObject({
-                        x: x - 0.5, y: 0.5,
-                        text: (x - 1).toString(),
-                        font: (this.scale() / 2).toString() + 'px Arial',
-                        alpha: 0.4
-                    }));
+                this.drawText(new TextObject({
+                    x: x - 0.5, y: 0.5,
+                    text: (x - 1).toString(),
+                    font: (this.scale() / 2).toString() + 'px Arial',
+                    alpha: 0.4
+                }));
             }
 
             for (var y = 1; y < this.height() / this.scale(); y++) {
@@ -343,7 +391,7 @@ function Editor(canvas_init) {
 
         this.drawArray(this.coordinates());
         figures.forEach(function (figure) {
-            self.drawArray(figure);
+            self.drawFigure(figure);
         });
     };
 

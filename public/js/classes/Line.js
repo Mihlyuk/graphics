@@ -97,11 +97,17 @@ function Line(parameters) {
         return alpha;
     };
 
-    this.color = function () {
+    this.color = function (new_color) {
+        if (new_color !== undefined) {
+            color = new_color;
+        }
         return color;
     };
 
-    this.lineWidth = function () {
+    this.lineWidth = function (newLineWidth) {
+        if (newLineWidth !== undefined) {
+            lineWidth = newLineWidth;
+        }
         return lineWidth;
     };
 

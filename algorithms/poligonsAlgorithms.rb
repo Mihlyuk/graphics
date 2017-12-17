@@ -8,7 +8,7 @@ class PoligonsAlgorithms
     chords = []
 
     coordinates = coordinates << coordinates.first
-    vectors = coordinates.map {|line| [line[1].x - line[0].x, line[1].y - line[0].y]}
+    vectors = coordinates.map { |line| [line[1].x - line[0].x, line[1].y - line[0].y] }
     coordinates.each_cons(2) do |line1, line2|
       chords << [
           [-(line1[1].y - line1[0].y), line1[1].x - line1[0].x],
@@ -22,13 +22,13 @@ class PoligonsAlgorithms
     end
 
     answer =
-        if vector_products.all? {|a| a == 0}
+        if vector_products.all? { |a| a == 0 }
           'cut'
-        elsif vector_products.all? {|a| a >= 0}
+        elsif vector_products.all? { |a| a >= 0 }
           'convex_left'
-        elsif vector_products.all? {|a| a < 0}
+        elsif vector_products.all? { |a| a < 0 }
           'convex_right'
-        elsif vector_products.any? {|a| a < 0} && vector_products.any? {|a| a >= 0}
+        elsif vector_products.any? { |a| a < 0 } && vector_products.any? { |a| a >= 0 }
           'concave'
         end
 
@@ -44,7 +44,7 @@ class PoligonsAlgorithms
     end
 
     {
-        normals: result.map {|a| a[:normal]},
+        normals: result.map { |a| a[:normal] },
         bulge: answer,
         result: result
     }
@@ -140,8 +140,8 @@ class PoligonsAlgorithms
   end
 
   def self.membership_point(poligon, point)
-    min_x = poligon.flatten(1).map {|a| a.x}.min
-    max_x = poligon.flatten(1).map {|a| a.x}.max
+    min_x = poligon.flatten(1).map { |a| a.x }.min
+    max_x = poligon.flatten(1).map { |a| a.x }.max
     line = [[min_x, point.y, 0, 1], [max_x, point.y, 0, 1]]
     normals = normals(poligon)[:result]
 
@@ -260,8 +260,8 @@ class PoligonsAlgorithms
         left_pixel = left_pixel.to_left
       end
 
-      top_right_pixel = line_pixels.map(&:to_top).select{|a| !result_pixels.include?(a) }.max_by(&:x)
-      bottom_right_pixel = line_pixels.map(&:to_bottom).select{|a| !result_pixels.include?(a) }.max_by(&:x)
+      top_right_pixel = line_pixels.map(&:to_top).select { |a| !result_pixels.include?(a) }.max_by(&:x)
+      bottom_right_pixel = line_pixels.map(&:to_bottom).select { |a| !result_pixels.include?(a) }.max_by(&:x)
 
       seed_pixels << top_right_pixel if top_right_pixel
       seed_pixels << bottom_right_pixel if bottom_right_pixel
@@ -272,14 +272,117 @@ class PoligonsAlgorithms
     result_pixels
   end
 
-  def self.hide_lines1(poligon, lines)
-    puts ''
+  # return [<coordinate|line>, true|false]
+  def self.hide_lines1(poligon, objects)
+    poligon_coordinates = poligon.flatten(1)
+    max_x = poligon_coordinates.select(&:x).max.x
+    min_x = poligon_coordinates.select(&:x).min.x
+    max_y = poligon_coordinates.select(&:y).max.y
+    min_y = poligon_coordinates.select(&:y).min.y
+    result_objects = []
+
+    objects.map do |object|
+      if object.point?
+        result_objects << [object, object.x <= max_x && object.x >= min_x && object.y <= max_y && object.y >= min_y]
+      elsif object.line?
+        point_1 = object[0]
+        point_2 = object[1]
+        tg = (point_2.y - point_1.y).to_f / (point_2.x - point_1.x).to_f
+
+        if point_1.code(poligon) == 0 && point_2.code(poligon) == 0
+          result_objects << object
+          next
+        end
+
+        intersections = []
+
+        if tg != Float::INFINITY
+          left = []
+          left.x = min_x
+          left.y = tg * (min_x - point_1.x) + point_1.y
+          intersections << left if left.y >= min_y && left.y <= max_y
+
+          right = []
+          right.x = max_x
+          right.y = tg * (max_x - point_1.x) + point_1.y
+          intersections << right if right.y >= min_y && right.y <= max_y
+        end
+
+        if tg != 0
+          bottom = []
+          bottom.x = point_1.x + (1.to_f / tg) * (min_y - point_1.y)
+          bottom.y = min_y
+          intersections << bottom if bottom.x <= max_x && bottom.x >= min_x
+
+          top = []
+          top.x = point_1.x + (1.to_f / tg) * (max_y - point_1.y)
+          top.y = max_y
+          intersections << top if top.x <= max_x && top.x >= min_x
+        end
+
+        if intersections.length == 1
+          object.each { |p| result_objects << p.code(poligon) == 0 }
+        end
+
+        result_objects << intersections.map { |a| [*a, 0, 1] }
+      end
+    end
+
+    result_objects
+  end
+
+  def self.hide_lines2(poligon, objects)
+    normals = normals(poligon)[:result]
+    result_objects = []
+
+    objects.each do |object|
+      point_1 = Vector[*object[0]]
+      point_2 = Vector[*object[1]]
+      t_results = []
+
+      normals.each do |normal|
+        corner_point = Vector[*normal[:vector][0]]
+        normal = Vector[*normal[:normal] + [0, 1]]
+        w = point_1 - corner_point
+        d = point_2 - point_1
+        t = -(w.dot(normal)) / (d.dot(normal))
+
+        t_results << {
+            't' => t,
+            'normal*d' => normal.dot(d),
+            'w*n' => w.dot(normal),
+            'w*n+n*d' => w.dot(normal) + normal.dot(d),
+        }
+      end
+
+      if t_results.any? { |h| h['normal*d'] == 0 }
+        # Отрезок выродился в точку или паралелен стороне полигона
+        next
+      elsif t_results.all? { |h| h['t'] < 0 && h['t'] > 1 && h['w*n'] < 0 && h['w*n+n*d'] < 0 }
+        # Тривиальное отсечение
+        next
+      elsif t_results.all? { |h| (h['t'] < 0 || h['t'] > 1) && h['w*n'] > 0 && h['w*n+n*d'] > 0 }
+        # Тривиальное изображение
+        result_objects << object
+      else
+        # Изображение части отрезка
+        bottom_t_plurality = t_results.select { |h| h['normal*d'] > 0 }.map { |h| h['t'] }.max
+        top_t_plurality = t_results.select { |h| h['normal*d'] <= 0 }.map { |h| h['t'] }.min
+
+        if top_t_plurality >= bottom_t_plurality
+          result_objects << [(point_1 + (point_2 - point_1) * top_t_plurality).to_a,
+                             (point_1 + (point_2 - point_1) * bottom_t_plurality).to_a]
+        end
+      end
+    end
+
+    result_objects
   end
 
   private
 
   def self.points_sort(points)
-    points.sort_by {|a| a[1]}.group_by {|a| a[1]}.map {|k, v| v.sort_by {|a| a[0]}}.flatten(1)
+    points.sort_by { |a| a[1] }.group_by { |a| a[1] }.map { |k, v| v.sort_by { |a| a[0] } }.flatten(1)
   end
 
   def self.to_points(poligon)
@@ -289,7 +392,7 @@ class PoligonsAlgorithms
       point_2 = line[1]
 
       points = Algorithms2d.brezenhem(line[0], line[1]).uniq(&:y)
-      points.reject! {|a| a.y == point_1.y || a.y == point_2.y}
+      points.reject! { |a| a.y == point_1.y || a.y == point_2.y }
       points.unshift(point_1)
       points.push(point_2)
 
@@ -314,35 +417,35 @@ class PoligonsAlgorithms
   end
 
   def self.min(coordinates)
-    min_y = coordinates.map {|a| a.y}.min
+    min_y = coordinates.map { |a| a.y }.min
 
-    result = coordinates.select {|point| point.y == min_y}
+    result = coordinates.select { |point| point.y == min_y }
 
     if result.length == 1
       return result.first
     else
-      min_x = result.map {|a| a.x}.min
+      min_x = result.map { |a| a.x }.min
 
-      return result.select {|point| point.x == min_x}.first
+      return result.select { |point| point.x == min_x }.first
     end
   end
 
   def self.max(coordinates)
-    max_y = coordinates.map {|a| a.y}.max
+    max_y = coordinates.map { |a| a.y }.max
 
-    result = coordinates.select {|point| point.y == max_y}
+    result = coordinates.select { |point| point.y == max_y }
 
     if result.length == 1
       return result.first
     else
-      max_x = result.map {|a| a.x}.max
+      max_x = result.map { |a| a.x }.max
 
-      return result.select {|point| point.x == max_x}.first
+      return result.select { |point| point.x == max_x }.first
     end
   end
 
   def self.turn_axis(coordinates)
-    coordinates.map {|c| [c.x, -c.y, c.z, c.p]}
+    coordinates.map { |c| [c.x, -c.y, c.z, c.p] }
   end
 
   def self.distance(coordinates1, coordinates2)

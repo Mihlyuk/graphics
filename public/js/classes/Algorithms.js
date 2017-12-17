@@ -71,11 +71,69 @@ function Algorithms() {
         return coordinates;
     };
 
+    this.hidden = function (object) {
+        var normals = object.map(function (poligon) {
+            var line1 = poligon[0];
+            var vector1 = [line1[1][0] - line1[0][0], line1[1][1] - line1[0][1], line1[1][2] - line1[0][2], line1[0][3]];
+            var line2 = poligon[1];
+            var vector2 = [line2[1][0] - line2[0][0], line2[1][1] - line2[0][1], line2[1][2] - line2[0][2], line2[0][3]];
+            var normal = crossProduct(vector1, vector2);
+            var d = matrix.multipleMatrix([normal], matrix.transpose([line1[0]]));
+            normal[3] = d[0][0];
+
+            return normal;
+        });
+        var middle = middlePoint(object);
+        normals = normals.map(function(normal) {
+            if (matrix.multipleMatrix([middle], matrix.transpose([normal]))[0][0] > 0) {
+                return normal.map(function(coordinate) {
+                    return coordinate * -1;
+                });
+            } else {
+                return normal;
+            }
+        });
+
+        normals = matrix.transpose(normals);
+        debugger;
+        matrix.multipleMatrix([[0, 0, 1, 0]], normals);
+        console.log(1);
+    };
+
     function distance(coordinates1, coordinates2) {
         return Math.sqrt(Math.pow(coordinates2[0] - coordinates1[0], 2) + Math.pow(coordinates2[1] - coordinates1[1], 2) + Math.pow(coordinates2[2] - coordinates1[2], 2))
     }
 
     function min(a, b) {
         return a < b ? a : b;
+    }
+
+    function crossProduct(a, b) {
+        return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0], a[3]];
+    }
+
+    function middlePoint(object) {
+        var points = [];
+
+        object.forEach(function (poligon) {
+            poligon.forEach(function (line) {
+                points.push(line[0]);
+                points.push(line[1]);
+            });
+        });
+
+        var minX = _.minBy(points, 0)[0];
+        var maxX = _.maxBy(points, 0)[0];
+        var minY = _.minBy(points, 1)[1];
+        var maxY = _.maxBy(points, 1)[1];
+        var minZ = _.minBy(points, 2)[2];
+        var maxZ = _.maxBy(points, 2)[2];
+
+        return [
+            Math.round(minX + (maxX - minX) / 2),
+            Math.round(minY + (maxY - minY) / 2),
+            Math.round(minZ + (maxZ - minZ) / 2),
+            1
+        ]
     }
 }

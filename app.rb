@@ -6,52 +6,7 @@ require 'pry'
 require_relative 'algorithms/algorithms2d'
 require_relative 'algorithms/algorithms3d'
 require_relative 'algorithms/poligonsAlgorithms.rb'
-
-class Array
-  def x
-    self[0]
-  end
-
-  def y
-    self[1]
-  end
-
-  def z
-    self[2]
-  end
-
-  def p
-    self[3]
-  end
-
-  def a
-    self[4]
-  end
-
-  def to_top
-    new_arr = self.dup
-    new_arr[1] += 1
-    new_arr
-  end
-
-  def to_bottom
-    new_arr = self.dup
-    new_arr[1] -= 1
-    new_arr
-  end
-
-  def to_right
-    new_arr = self.dup
-    new_arr[0] += 1
-    new_arr
-  end
-
-  def to_left
-    new_arr = self.dup
-    new_arr[0] -= 1
-    new_arr
-  end
-end
+require_relative 'algorithms/basic_sugar.rb'
 
 get '/' do
   erb :index
@@ -245,6 +200,15 @@ post '/hide_lines_1' do
   lines = @params[:lines].values.map {|a| a.values.map {|b| b.values.map {|c| c.map(&:to_f)}}}.flatten(1)
 
   {result: PoligonsAlgorithms.hide_lines1(poligon, lines)}.to_json
+end
+
+post '/hide_lines_2' do
+  Vector[0,9,0].cross_product Vector[9,0,0]
+
+  poligon = get_coordinates(:poligon)
+  lines = @params[:lines].values.map {|a| a.values.map {|b| b.values.map {|c| c.map(&:to_f)}}}.flatten(1)
+
+  {result: PoligonsAlgorithms.hide_lines2(poligon, lines)}.to_json
 end
 
 def get_coordinates(field)

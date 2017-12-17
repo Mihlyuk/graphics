@@ -7,37 +7,37 @@ class Algorithms2d
 
     x = point_1.x
     y = point_1.y
-    dx = (point_2.x - point_1.x).abs
-    dy = (point_2.y - point_1.y).abs
+    length_x = (point_2.x - point_1.x).abs
+    length_y = (point_2.y - point_1.y).abs
 
-    change_x = point_1.x < point_2.x ? 1 : -1
-    change_y = point_1.y < point_2.y ? 1 : -1
+    dx = point_1.x < point_2.x ? 1 : -1
+    dy = point_1.y < point_2.y ? 1 : -1
 
     result << [x, y, point_1.z, point_1.p]
 
     i = 1
 
-    if dx >= dy
-      e = 2 * dy - dx
-      while i <= dx do
+    if length_x >= length_y
+      e = 2 * length_y - length_x
+      while i <= length_x do
         if e >= 0
-          y += change_y
-          e -= 2 * dx
+          y += dy
+          e -= 2 * length_x
         end
-        x += change_x
-        e += 2 * dy
+        x += dx
+        e += 2 * length_y
         result << [x, y, point_1.z, point_1.p]
-        i+=1
+        i += 1
       end
     else
-      e = 2 * dx - dy
-      while i <= dy do
+      e = 2 * length_x - length_y
+      while i <= length_y do
         if e >= 0
-          x += change_x
-          e -= 2 * dy
+          x += dx
+          e -= 2 * length_y
         end
-        y += change_y
-        e += 2 * dx
+        y += dy
+        e += 2 * length_x
         result << [x, y, point_1.z, point_1.p]
         i+=1
       end

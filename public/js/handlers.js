@@ -72,8 +72,12 @@
     dom.axisZ2.on('change', editor.update.bind(editor));
 
     dom.cube.on('click', function () {
-        cube.forEach(function (coordinate) {
-            editor.addCoordinate(new Point({x: coordinate[0], y: coordinate[1], z: coordinate[2]}));
+        cube.forEach(function (coordinates) {
+            var figure = editor.toPoints(coordinates);
+            figure[0].color('#' + Math.floor(Math.random() * 16777215).toString(16));
+
+            editor.addFigure(figure);
+
             editor.update();
         })
     });
@@ -127,19 +131,35 @@
     dom.canvas.on('wheel', function (event) {
         event.preventDefault();
 
-        if (editor.coordinates().length === 0) {
+        if (editor.figures().length === 0) {
             alert("Draw something =)");
             return;
         }
 
-        var coordinates = editor.coordinatesArray();
+
+        var figures = editor.figuresArray();
+        var figuresColor = editor.figures().map(function(figure) {
+            return figure[0].color();
+        });
+        var coordinates = editor.figuresToCoordinates(figures);
+
         var axis = [
             [dom.axisX1Value(), dom.axisY1Value(), dom.axisZ1Value()],
             [dom.axisX2Value(), dom.axisY2Value(), dom.axisZ2Value()]
         ];
 
-        editor.clearCoordinates();
-        editor.addCoordinates(algorithms.rotate(coordinates, axis, 30));
+        editor.clearFigures();
+
+        // var rotateCoordinates = algorithms.rotate(coordinates, axis, 25);
+        var rotateFigures = editor.coordinatesToFigures(coordinates);
+        var hiddenFigure = algorithms.hidden(rotateFigures);
+        rotateFigures.forEach(function(rotateFigure, index) {
+            var figure = editor.toPoints(rotateFigure);
+            figure[0].color(figuresColor[index]);
+
+            return editor.addFigure(figure);
+        });
+
         editor.update();
     });
 
@@ -488,11 +508,11 @@
         });
     });
 
-    dom.membershipPointButton.on('click', function() {
+    dom.membershipPointButton.on('click', function () {
         $.ajax({
             type: "POST",
             url: "/membership_point",
-            data: {poligon: editor.figuresArray()[0], point: editor.coordinatesArray()[0] },
+            data: {poligon: editor.figuresArray()[0], point: editor.coordinatesArray()[0]},
             success: function (responce) {
                 if (JSON.parse(responce).result) {
                     alert('Точка принадлежит плоскости');
@@ -503,7 +523,7 @@
         });
     });
 
-    dom.sketch1Button.on('click', function() {
+    dom.sketch1Button.on('click', function () {
         if (editor.figuresArray().length < 1) {
             alert("Для начала нарисуйте полигон =)");
             return;
@@ -512,16 +532,16 @@
         $.ajax({
             type: "POST",
             url: "/raster_scan_1",
-            data: {poligon: editor.figuresArray()[0] },
+            data: {poligon: editor.figuresArray()[0]},
             success: function (responce) {
-                JSON.parse(responce).result.forEach(function(point) {
+                JSON.parse(responce).result.forEach(function (point) {
                     editor.draw(point);
                 });
             }
         });
     });
 
-    dom.sketch2Button.on('click', function() {
+    dom.sketch2Button.on('click', function () {
         if (editor.figuresArray().length < 1) {
             alert("Для начала нарисуйте полигон =)");
             return;
@@ -530,16 +550,16 @@
         $.ajax({
             type: "POST",
             url: "/raster_scan_1",
-            data: {poligon: editor.figuresArray()[0] },
+            data: {poligon: editor.figuresArray()[0]},
             success: function (responce) {
-                JSON.parse(responce).result.forEach(function(point) {
+                JSON.parse(responce).result.forEach(function (point) {
                     editor.draw(point);
                 });
             }
         });
     });
 
-    dom.sketch3Button.on('click', function() {
+    dom.sketch3Button.on('click', function () {
         if (editor.figuresArray().length < 1) {
             alert("Для начала нарисуйте полигон =)");
             return;
@@ -548,16 +568,16 @@
         $.ajax({
             type: "POST",
             url: "/raster_scan_3",
-            data: {poligon: editor.figuresArray()[0], coordinate: editor.coordinatesArray()[0] },
+            data: {poligon: editor.figuresArray()[0], coordinate: editor.coordinatesArray()[0]},
             success: function (responce) {
-                JSON.parse(responce).result.forEach(function(point) {
+                JSON.parse(responce).result.forEach(function (point) {
                     editor.draw(point);
                 });
             }
         });
     });
 
-    dom.sketch4Button.on('click', function() {
+    dom.sketch4Button.on('click', function () {
         if (editor.figuresArray().length < 1) {
             alert("Для начала нарисуйте полигон =)");
             return;
@@ -566,16 +586,16 @@
         $.ajax({
             type: "POST",
             url: "/raster_scan_4",
-            data: {poligon: editor.figuresArray()[0], coordinate: editor.coordinatesArray()[0] },
+            data: {poligon: editor.figuresArray()[0], coordinate: editor.coordinatesArray()[0]},
             success: function (responce) {
-                JSON.parse(responce).result.forEach(function(point) {
+                JSON.parse(responce).result.forEach(function (point) {
                     editor.draw(point);
                 });
             }
         });
     });
 
-    dom.sketch4Button.on('click', function() {
+    dom.sketch4Button.on('click', function () {
         if (editor.figuresArray().length < 1) {
             alert("Нарисуйте полигон =)");
             return;
@@ -584,16 +604,16 @@
         $.ajax({
             type: "POST",
             url: "/raster_scan_4",
-            data: {poligon: editor.figuresArray()[0], coordinate: editor.coordinatesArray()[0] },
+            data: {poligon: editor.figuresArray()[0], coordinate: editor.coordinatesArray()[0]},
             success: function (responce) {
-                JSON.parse(responce).result.forEach(function(point) {
+                JSON.parse(responce).result.forEach(function (point) {
                     editor.draw(point);
                 });
             }
         });
     });
 
-    dom.hideLines1.on('click', function() {
+    dom.hideLines1.on('click', function () {
         if (editor.figuresArray().length < 1) {
             alert("Нарисуйте полигон =)");
             return;
@@ -602,14 +622,43 @@
         $.ajax({
             type: "POST",
             url: "/hide_lines_1",
-            data: {poligon: editor.figuresArray()[0], lines: editor.figuresArray().slice(1) },
+            data: {poligon: editor.figuresArray()[0], lines: editor.figuresArray().slice(1)},
             success: function (responce) {
-                JSON.parse(responce).result.forEach(function(point) {
-                    editor.draw(point);
+                JSON.parse(responce).result.forEach(function (object) {
+                    debugger;
+                    var figure = editor.toPoint(object);
+                    if (figure instanceof Line) {
+                        figure.lineWidth(0.3);
+                    }
+                    figure.color('green');
+                    editor.draw(figure);
                 });
             }
         });
     });
 
+    dom.hideLines2.on('click', function () {
+        if (editor.figuresArray().length < 1) {
+            alert("Нарисуйте полигон =)");
+            return;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/hide_lines_2",
+            data: {poligon: editor.figuresArray()[0], lines: editor.figuresArray().slice(1)},
+            success: function (responce) {
+                JSON.parse(responce).result.forEach(function (object) {
+                    debugger;
+                    var figure = editor.toPoint(object);
+                    if (figure instanceof Line) {
+                        figure.lineWidth(0.3);
+                    }
+                    figure.color('green');
+                    editor.draw(figure);
+                });
+            }
+        });
+    });
 
 })();

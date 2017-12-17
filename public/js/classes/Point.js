@@ -65,7 +65,10 @@ function Point(parameters) {
         return alpha;
     };
 
-    this.color = function () {
+    this.color = function (new_color) {
+        if (new_color !== undefined) {
+            color = new_color;
+        }
         return color;
     };
 
