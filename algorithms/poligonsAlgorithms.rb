@@ -117,12 +117,12 @@ class PoligonsAlgorithms
   end
 
   def self.point_of_intersection(poligon, line)
-    line.flatten!(1)
+    line = line.flatten(1).map{|a| a[0..3]}
     normals = normals(poligon)[:result]
 
     intersections = normals.map do |n|
       normal = n[:normal]
-      vector = n[:vector][1]
+      vector = n[:vector][1][0..3]
       normal << 1
       normal << 1
 
@@ -147,7 +147,7 @@ class PoligonsAlgorithms
 
     intersections = normals.map do |n|
       normal = n[:normal]
-      vector = n[:vector][1]
+      vector = n[:vector][1][0..3]
       normal << 1
       normal << 1
 
@@ -169,13 +169,14 @@ class PoligonsAlgorithms
   end
 
   def self.raster_scan_1(poligon)
-    points = to_points(poligon)
+    points = to_points(poligon).map{|a| a[0..3]}
 
     # correct point duplicate
     points = points.group_by(&:y).values.map do |points_in_line|
       if points_in_line.length % 2 != 0
         points_in_line.uniq
       elsif points_in_line
+        points_in_line
       end
     end.flatten(1)
 
@@ -336,12 +337,12 @@ class PoligonsAlgorithms
     result_objects = []
 
     objects.each do |object|
-      point_1 = Vector[*object[0]]
-      point_2 = Vector[*object[1]]
+      point_1 = Vector[*object[0][0..3]]
+      point_2 = Vector[*object[1][0..3]]
       t_results = []
 
       normals.each do |normal|
-        corner_point = Vector[*normal[:vector][0]]
+        corner_point = Vector[*normal[:vector][0][0..3]]
         normal = Vector[*normal[:normal] + [0, 1]]
         w = point_1 - corner_point
         d = point_2 - point_1

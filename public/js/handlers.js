@@ -74,7 +74,12 @@
     dom.cube.on('click', function () {
         cube.forEach(function (coordinates) {
             var figure = editor.toPoints(coordinates);
-            figure[0].color('#' + Math.floor(Math.random() * 16777215).toString(16));
+            var color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+
+            figure = figure.map(function (line) {
+                line.color(color);
+                return line;
+            });
 
             editor.addFigure(figure);
 
@@ -86,38 +91,50 @@
     dom.document.on('keydown', function (event) {
         switch (event.keyCode) {
             case 65:
-                editor.coordinates().forEach(function (coordinate) {
-                    coordinate.moveX(-1);
+                editor.figures().forEach(function (figure) {
+                    figure.forEach(function (line) {
+                        line.moveX(-1);
+                    });
                 });
                 editor.update();
                 break;
             case 68:
-                editor.coordinates().forEach(function (coordinate) {
-                    coordinate.moveX(+1);
+                editor.figures().forEach(function (figure) {
+                    figure.forEach(function (line) {
+                        line.moveX(+1);
+                    });
                 });
                 editor.update();
                 break;
             case 87:
-                editor.coordinates().forEach(function (coordinate) {
-                    coordinate.moveY(-1);
+                editor.figures().forEach(function (figure) {
+                    figure.forEach(function (line) {
+                        line.moveY(-1);
+                    });
                 });
                 editor.update();
                 break;
             case 88:
-                editor.coordinates().forEach(function (coordinate) {
-                    coordinate.moveY(+1);
+                editor.figures().forEach(function (figure) {
+                    figure.forEach(function (line) {
+                        line.moveY(+1);
+                    });
                 });
                 editor.update();
                 break;
             case 69:
-                editor.coordinates().forEach(function (coordinate) {
-                    coordinate.moveZ(-1);
+                editor.figures().forEach(function (figure) {
+                    figure.forEach(function (line) {
+                        line.moveZ(-1);
+                    });
                 });
                 editor.update();
                 break;
             case 90:
-                editor.coordinates().forEach(function (coordinate) {
-                    coordinate.moveZ(+1);
+                editor.figures().forEach(function (figure) {
+                    figure.forEach(function (line) {
+                        line.moveZ(+1);
+                    });
                 });
                 editor.update();
                 break;
@@ -138,29 +155,36 @@
 
 
         var figures = editor.figuresArray();
-        var figuresColor = editor.figures().map(function(figure) {
-            return figure[0].color();
-        });
         var coordinates = editor.figuresToCoordinates(figures);
 
         var axis = [
             [dom.axisX1Value(), dom.axisY1Value(), dom.axisZ1Value()],
             [dom.axisX2Value(), dom.axisY2Value(), dom.axisZ2Value()]
         ];
-
-        editor.clearFigures();
-
-        // var rotateCoordinates = algorithms.rotate(coordinates, axis, 25);
-        var rotateFigures = editor.coordinatesToFigures(coordinates);
-        var hiddenFigure = algorithms.hidden(rotateFigures);
-        rotateFigures.forEach(function(rotateFigure, index) {
-            var figure = editor.toPoints(rotateFigure);
-            figure[0].color(figuresColor[index]);
-
-            return editor.addFigure(figure);
+        debugger;
+        var colors = coordinates.map(function (coordinate) {
+            return coordinate[4];
+        });
+        var rotateCoordinates = algorithms.rotate(coordinates, axis, 25);
+        colors.forEach(function (color, index) {
+            rotateCoordinates[index][4] = color;
         });
 
+        var rotateFigures = editor.coordinatesToFigures(rotateCoordinates);
+        var hiddenFigures = algorithms.hidden(rotateFigures);
+
+        editor.clearFigures();
+        hiddenFigures['hidden'].forEach(function (tempFigure) {
+            var figure = editor.toPoints(tempFigure);
+            figure[0].color(figure[0].color());
+            editor.addFigure(figure);
+        });
         editor.update();
+
+        editor.clearFigures();
+        hiddenFigures['all'].forEach(function (figure) {
+            editor.addFigure(editor.toPoints(figure));
+        });
     });
 
     dom.cdaButton.on('click', function () {

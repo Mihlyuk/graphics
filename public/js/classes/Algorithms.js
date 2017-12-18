@@ -78,26 +78,37 @@ function Algorithms() {
             var line2 = poligon[1];
             var vector2 = [line2[1][0] - line2[0][0], line2[1][1] - line2[0][1], line2[1][2] - line2[0][2], line2[0][3]];
             var normal = crossProduct(vector1, vector2);
-            var d = matrix.multipleMatrix([normal], matrix.transpose([line1[0]]));
-            normal[3] = d[0][0];
+            normal[3] = -matrix.multipleMatrix([line1[0]], matrix.transpose([normal]))[0][0];
 
             return normal;
         });
         var middle = middlePoint(object);
-        normals = normals.map(function(normal) {
-            if (matrix.multipleMatrix([middle], matrix.transpose([normal]))[0][0] > 0) {
-                return normal.map(function(coordinate) {
-                    return coordinate * -1;
-                });
+        var normalsCorrect = matrix.multipleMatrix([middle], matrix.transpose(normals));
+        var correctMatrix = normalsCorrect[0].map(function (index) {
+            if (index > 0) {
+                return -1;
             } else {
-                return normal;
+                return 1;
             }
         });
 
-        normals = matrix.transpose(normals);
-        debugger;
-        matrix.multipleMatrix([[0, 0, 1, 0]], normals);
-        console.log(1);
+        normals = matrix.transpose(normals).map(function (normal) {
+            return normal.map(function (coordinate, normalIndex) {
+                return coordinate * correctMatrix[normalIndex];
+            });
+        });
+
+        var resultObjectsMarker = matrix.multipleMatrix([[0, 0, -1, 0]], normals)[0];
+
+        var result = [];
+
+        resultObjectsMarker.forEach(function (marker, markerIndex) {
+            if (marker > 0) {
+                result.push(object[markerIndex]);
+            }
+        });
+
+        return {all: object, hidden: result};
     };
 
     function distance(coordinates1, coordinates2) {
@@ -109,7 +120,11 @@ function Algorithms() {
     }
 
     function crossProduct(a, b) {
-        return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0], a[3]];
+        return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0], 0];
+    }
+
+    function innerProduct(a, b) {
+        return [a[0] * b[0] + a[1] * b[1] + a[2] * b[2]];
     }
 
     function middlePoint(object) {

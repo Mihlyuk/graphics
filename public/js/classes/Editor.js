@@ -259,11 +259,12 @@ function Editor(canvas_init) {
         if (Array.isArray(coordinate[0]) && Array.isArray(coordinate[1])) {
             result = new Line({
                 x1: coordinate[0][0], y1: coordinate[0][1], z1: coordinate[0][2], perspective1: coordinate[0][3],
-                x2: coordinate[1][0], y2: coordinate[1][1], z2: coordinate[1][2], perspective2: coordinate[1][3]
+                x2: coordinate[1][0], y2: coordinate[1][1], z2: coordinate[1][2], perspective2: coordinate[1][3],
+                color: coordinate[0][4]
             })
         } else {
             result = new Point({
-                x: coordinate[0], y: coordinate[1], z: coordinate[2], perspective: coordinate[3]
+                x: coordinate[0], y: coordinate[1], z: coordinate[2], perspective: coordinate[3], color: coordinate[4]
             });
         }
 
@@ -324,12 +325,21 @@ function Editor(canvas_init) {
         }
 
         context.beginPath();
-        context.moveTo(figure[0].x1() * this.scale(), figure[0].y1() * this.scale());
+        context.moveTo(
+            figure[0].x1() * this.scale() + this.scale() / 2,
+            figure[0].y1() * this.scale() + this.scale() / 2
+        );
 
         figure.forEach(function (line) {
-            context.lineTo(line.x2() * self.scale(), line.y2() * self.scale());
+            context.lineTo(
+                line.x2() * self.scale() + self.scale() / 2,
+                line.y2() * self.scale() + self.scale() / 2
+            );
         });
-        context.fill();
+        context.stroke();
+        if (figure[0].color() !== 'black') {
+            context.fill();
+        }
 
         this.contextReset();
     };
