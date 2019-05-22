@@ -324,6 +324,11 @@ function Editor(canvas_init) {
             context.fillStyle = figure[0].color();
         }
 
+        if (figure[0].alpha()) {
+            debugger;
+            context.globalAlpha = figure[0].alpha();
+        }
+
         context.beginPath();
         context.moveTo(
             figure[0].x1() * this.scale() + this.scale() / 2,

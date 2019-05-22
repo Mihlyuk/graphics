@@ -93,7 +93,10 @@ function Line(parameters) {
         return perspective2;
     };
 
-    this.alpha = function () {
+    this.alpha = function (new_alpha) {
+        if (new_alpha !== undefined) {
+            alpha = new_alpha;
+        }
         return alpha;
     };
 

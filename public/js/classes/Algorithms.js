@@ -100,15 +100,18 @@ function Algorithms() {
 
         var resultObjectsMarker = matrix.multipleMatrix([[0, 0, -1, 0]], normals)[0];
 
-        var result = [];
+        var resultBack = [];
+        var resultFront = [];
 
         resultObjectsMarker.forEach(function (marker, markerIndex) {
             if (marker > 0) {
-                result.push(object[markerIndex]);
+                resultFront.push(object[markerIndex]);
+            } else {
+                resultBack.push(object[markerIndex]);
             }
         });
 
-        return {all: object, hidden: result};
+        return {all: object, front: resultFront, back: resultBack};
     };
 
     function distance(coordinates1, coordinates2) {

@@ -95,9 +95,6 @@ class PoligonsAlgorithms
     while coordinates.length > 0
       point = shell.last
 
-      if shell.include?(max_y)
-
-      end
       next_point = coordinates.max_by do |next_p|
         angle = Math.atan((next_p.y - point.y).to_f / (next_p.x - point.x)) / Math::PI * 180
         angle = to_full_angle(angle, point.x, point.y, next_p.x, next_p.y)

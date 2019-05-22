@@ -161,7 +161,6 @@
             [dom.axisX1Value(), dom.axisY1Value(), dom.axisZ1Value()],
             [dom.axisX2Value(), dom.axisY2Value(), dom.axisZ2Value()]
         ];
-        debugger;
         var colors = coordinates.map(function (coordinate) {
             return coordinate[4];
         });
@@ -174,9 +173,18 @@
         var hiddenFigures = algorithms.hidden(rotateFigures);
 
         editor.clearFigures();
-        hiddenFigures['hidden'].forEach(function (tempFigure) {
+
+        debugger;
+        hiddenFigures['front'].forEach(function (tempFigure) {
             var figure = editor.toPoints(tempFigure);
             figure[0].color(figure[0].color());
+            editor.addFigure(figure);
+        });
+
+        hiddenFigures['back'].forEach(function (tempFigure) {
+            var figure = editor.toPoints(tempFigure);
+            figure[0].color(figure[0].color());
+            figure[0].alpha(0.5);
             editor.addFigure(figure);
         });
         editor.update();
