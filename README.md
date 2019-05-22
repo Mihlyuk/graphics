@@ -15,8 +15,10 @@ Subscript k takes integer values starting from 0, for the 1st point and increase
 
 For lines with slope greater than 1, we reverse the role of x and y i.e. we sample at dy=1 and calculate consecutive x values as
 
-{\displaystyle x_{k+1}=x_{k}+{\frac {1}{m}}} x_{{k+1}}=x_{k}+{\frac  {1}{m}}
-{\displaystyle y_{k+1}=y_{k}+1} {\displaystyle y_{k+1}=y_{k}+1}
+![](readme_images/da75e954230f9cf6150ddd14770bd668ef0b66b4.svg)
+
+![](readme_images/4b4ab7512f7b3d8ce8c07fc3657bf6b5aef3c989.svg)
+
 Similar calculations are carried out to determine pixel positions along a line with negative slope. Thus, if the absolute value of the slope is less than 1, we set dx=1 if {\displaystyle x_{\rm {start}}<x_{\rm {end}}} {\displaystyle x_{\rm {start}}<x_{\rm {end}}} i.e. the starting extreme point is at the left.
 
 ### Bresenham algorithm
