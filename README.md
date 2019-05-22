@@ -7,7 +7,9 @@ A linear DDA starts by calculating the smaller of dy or dx for a unit increment 
 
 Considering a line with positive slope, if the slope is less than or equal to 1, we sample at unit x intervals (dx=1) and compute successive y values as
 
-![](readme_images/Screenshot%202019-05-23%20at%2001.08.12.png)
+![](readme_images/d89b23e1fb8f448f204338609ba0c951f7444166.svg)
+
+![](readme_images/56702997e6d5296ae61c9aff4f6017e4ee02aaf7.svg)
 
 Subscript k takes integer values starting from 0, for the 1st point and increases by 1 until endpoint is reached. y value is rounded off to nearest integer to correspond to a screen pixel.
 
