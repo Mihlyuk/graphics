@@ -325,7 +325,6 @@ function Editor(canvas_init) {
         }
 
         if (figure[0].alpha()) {
-            debugger;
             context.globalAlpha = figure[0].alpha();
         }
 

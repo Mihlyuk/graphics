@@ -11,11 +11,11 @@
     <button id="scaleMinus" type="button" class="add-image btn navbar-btn">
       <span class="glyphicon glyphicon-zoom-out" aria-hidden="true"></span>
     </button>
-    <button id="clearCanvas" type="button" class="add-image btn btn-danger navbar-btn">clear</button>
+    <button id="clearCanvas" type="button" class="add-image btn btn-danger navbar-btn">Clear</button>
     <label for="throttling">Throttle</label>
     <input id="throttling" type="number" style="width:40px" value=0 min=0 max=50 pattern="\d+">
-    <button id="meshOn" type="button" class="add-image btn btn-success navbar-btn">Вкл. сетку</button>
-    <button id="meshOff" type="button" class="add-image btn btn-danger navbar-btn">Выкл. сетку</button>
+    <button id="meshOn" type="button" class="add-image btn btn-success navbar-btn">Mesh on</button>
+    <button id="meshOff" type="button" class="add-image btn btn-danger navbar-btn">Mesh off</button>
 
     <hr style="margin-top: 0; margin-bottom: 0; border: 0; border-top: 1px solid #515050;">
 
@@ -31,15 +31,16 @@
     <input id="axisY2" type="number" style="width:40px" value=2 min=0 max=50 pattern="\d+">
     <label for="axisZ2">Z2</label>
     <input id="axisZ2" type="number" style="width:40px" value=5 min=0 max=50 pattern="\d+">
-    <button id="axisOn" type="button" class="add-image btn btn-success navbar-btn">Вкл. ось</button>
-    <button id="axisOff" type="button" class="add-image btn btn-danger navbar-btn">Выкл. ось</button>
+    <button id="axisOn" type="button" class="add-image btn btn-success navbar-btn">Axis on</button>
+    <button id="axisOff" type="button" class="add-image btn btn-danger navbar-btn">Axis off</button>
 
     <hr style="margin-top: 0; margin-bottom: 0; border: 0; border-top: 1px solid #515050;">
 
     <div class="section" data-section="1">
-      <button id="cda" type="button" class="add-image btn btn-primary navbar-btn">ЦДА</button>
-      <button id="brez" type="button" class="add-image btn btn-primary navbar-btn">Брезенхем</button>
-      <button id="woo" type="button" class="add-image btn btn-primary navbar-btn">Ву</button>
+      <label>Line with algorithm</label>
+      <button id="cda" type="button" class="add-image btn btn-primary navbar-btn">DDA</button>
+      <button id="brez" type="button" class="add-image btn btn-primary navbar-btn">Bresenham</button>
+      <button id="woo" type="button" class="add-image btn btn-primary navbar-btn">Antialiasing (Wu)</button>
       <hr style="margin-top: 0; margin-bottom: 0; border: 0; border-top: 1px solid #515050;">
       <button id="circle" type="button" class="add-image btn btn-primary navbar-btn">Circle</button>
       <label for="circleRadius">Radius</label>
@@ -61,39 +62,40 @@
       <label for="parabolaRadius">Radius</label>
       <input id="parabolaRadius" type="number" style="width:40px" value=1 min=0 max=50 pattern="\d+">
       <hr style="margin-top: 0; margin-bottom: 0; border: 0; border-top: 1px solid #515050;">
-      <button id="hermit" type="button" class="add-image btn btn-primary navbar-btn">Хермит</button>
-      <button id="bezier" type="button" class="add-image btn btn-primary navbar-btn">Безье</button>
-      <button id="b_spline" type="button" class="add-image btn btn-primary navbar-btn">B-сплайн</button>
+      <label>Line with approximation</label>
+      <button id="hermit" type="button" class="add-image btn btn-primary navbar-btn">Hermite</button>
+      <button id="bezier" type="button" class="add-image btn btn-primary navbar-btn">Bezier</button>
+      <button id="b_spline" type="button" class="add-image btn btn-primary navbar-btn">B-spline</button>
       <hr style="margin-top: 0; margin-bottom: 0; border: 0; border-top: 1px solid #515050;">
     </div>
 
     <div class="section" data-section="2" style="display:none;">
       <button id="cube" type="button" class="add-image btn btn-success navbar-btn">
-        Вставить куб
+        Insert cube
       </button>
       <hr style="margin-top: 0; margin-bottom: 0; border: 0; border-top: 1px solid #515050;">
     </div>
 
     <div class="section" data-section="3" style="display:none;">
-      <button id="createPoligon" type="button" class="btn btn-success navbar-btn">Нарисовать полигон</button>
-      <button id="createLine" type="button" class="btn btn-success navbar-btn">Нарисовать линию</button>
+      <button id="createPoligon" type="button" class="btn btn-success navbar-btn">Draw polygon</button>
+      <button id="createLine" type="button" class="btn btn-success navbar-btn">Draw line</button>
       <hr style="margin-top: 0; margin-bottom: 0; border: 0; border-top: 1px solid #515050;">
-      <button id="bulgeChecking" type="button" class="btn btn-primary navbar-btn">Проверка на выпуклость</button>
-      <button id="GrekhemShell" type="button" class="btn btn-primary navbar-btn">Выпуклая оболочка Грехема</button>
+      <button id="bulgeChecking" type="button" class="btn btn-primary navbar-btn">Bulge check</button>
+      <button id="GrekhemShell" type="button" class="btn btn-primary navbar-btn">Graham's convex hull</button>
       <br>
-      <button id="JarvisShell" type="button" class="btn btn-primary navbar-btn">Выпуклая оболочка Джарвиса</button>
-      <button id="point_of_intersection" type="button" class="btn btn-primary navbar-btn">Точка пересечения</button>
+      <button id="JarvisShell" type="button" class="btn btn-primary navbar-btn">Jarvis Convex Shell</button>
+      <button id="point_of_intersection" type="button" class="btn btn-primary navbar-btn">Intersection point</button>
       <br>
-      <button id="membership_points" type="button" class="btn btn-primary navbar-btn">Принадлежность точки плоскости</button>
+      <button id="membership_points" type="button" class="btn btn-primary navbar-btn">Belonging of a point of a plane</button>
       <hr style="margin-top: 0; margin-bottom: 0; border: 0; border-top: 1px solid #515050;">
-      <button id="sketch1" type="button" class="btn btn-warning navbar-btn">Зарисовать (Развертка)</button>
-      <button id="sketch2" type="button" class="btn btn-warning navbar-btn">Зарисовать (Развертка с САР)</button>
+      <button id="sketch1" type="button" class="btn btn-warning navbar-btn">Sketch (Sweep)</button>
+      <button id="sketch2" type="button" class="btn btn-warning navbar-btn">Sketch (Sweep with AEL)</button>
       <br>
-      <button id="sketch3" type="button" class="btn btn-warning navbar-btn">Зарисовать (Прастая затравка)</button>
-      <button id="sketch4" type="button" class="btn btn-warning navbar-btn">Зарисовать (Построчная затравка)</button>
+      <button id="sketch3" type="button" class="btn btn-warning navbar-btn">Sketch (Simple Seed)</button>
+      <button id="sketch4" type="button" class="btn btn-warning navbar-btn">Sketch (Progressive Seed)</button>
       <hr style="margin-top: 0; margin-bottom: 0; border: 0; border-top: 1px solid #515050;">
-      <button id="hideLines1" type="button" class="btn btn-warning navbar-btn">Спрятать (Метод Коэна-Сазерленда)</button>
-      <button id="hideLines2" type="button" class="btn btn-warning navbar-btn">Спрятать (Метод Кируса – Бэка)</button>
+      <button id="hideLines1" type="button" class="btn btn-warning navbar-btn">Hide (Cohen-Sutherland Method)</button>
+      <button id="hideLines2" type="button" class="btn btn-warning navbar-btn">Hide (Cyrus-Beck Method)</button>
     </div>
 
   </div>

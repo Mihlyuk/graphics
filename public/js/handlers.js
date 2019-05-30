@@ -174,7 +174,6 @@
 
         editor.clearFigures();
 
-        debugger;
         hiddenFigures['front'].forEach(function (tempFigure) {
             var figure = editor.toPoints(tempFigure);
             figure[0].color(figure[0].color());
@@ -459,19 +458,19 @@
                 var normals = JSON.parse(responce).result.normals;
                 var bulge = JSON.parse(responce).result.bulge;
 
-                alert("Нормали: " + normals.toString());
+                alert("Normals: " + normals.toString());
                 switch (bulge) {
                     case 'cut':
-                        alert("Полигон вырождается в отрезок.");
+                        alert("Polygon degenerates into a segment.");
                         break;
                     case 'convex_left':
-                        alert("Полигон выпуклый, нормали ориентированы влево от контура.");
+                        alert("Polygon Convex, oriented normal to the left of the contour.");
                         break;
                     case 'convex_right':
-                        alert("Полигон выпуклый, нормали ориентированы вправо от контура.");
+                        alert("Polygon Convex, oriented normal to the right of the contour.");
                         break;
                     case 'concave':
-                        alert("Вогнутый полигон.");
+                        alert("Concave polygon.");
                         break;
                 }
             }
@@ -657,7 +656,6 @@
             data: {poligon: editor.figuresArray()[0], lines: editor.figuresArray().slice(1)},
             success: function (responce) {
                 JSON.parse(responce).result.forEach(function (object) {
-                    debugger;
                     var figure = editor.toPoint(object);
                     if (figure instanceof Line) {
                         figure.lineWidth(0.3);
@@ -681,7 +679,6 @@
             data: {poligon: editor.figuresArray()[0], lines: editor.figuresArray().slice(1)},
             success: function (responce) {
                 JSON.parse(responce).result.forEach(function (object) {
-                    debugger;
                     var figure = editor.toPoint(object);
                     if (figure instanceof Line) {
                         figure.lineWidth(0.3);
